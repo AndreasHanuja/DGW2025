@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace Game.Map
 {
-
     [RequireComponent(typeof(VoxelModel)), RequireComponent(typeof(VoxelView))]
     public class VoxelPresenter : MonoBehaviour
     {
@@ -15,11 +14,11 @@ namespace Game.Map
             view = GetComponent<VoxelView>();
         }
 
-        public void SetValue(Vector3Int position, byte value)
+        public void SetValue(Vector3Int position, int value)
         {
             model.SetValue(position, value);
         }
-        public byte GetValue(Vector3Int position)
+        public int GetValue(Vector3Int position)
         {
             return model.GetValue(position);
         }
