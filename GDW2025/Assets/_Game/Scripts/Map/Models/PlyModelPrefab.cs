@@ -1,5 +1,6 @@
 
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Game.Map.Models
 {
@@ -19,5 +20,12 @@ namespace Game.Map.Models
         public string[] seitenHashs = new string[6];
 
         public List<int> allowedInputs = new List<int>();
+
+        public PlyModel Instantiate(Vector3Int offset)
+        {
+            return new PlyModel(offset, this);
+        }
     }
+
+
 }
