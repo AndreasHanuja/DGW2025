@@ -8,32 +8,19 @@ namespace Game.Map
     {
         [SerializeField] private GameObject chunkPrefab;
 
-        private List<MeshFilter> inactiveChunks = new();
-        private Dictionary<Vector3Int, MeshFilter> activeChunks;
+        private Dictionary<Vector3Int, MeshFilter> chunks = new();
 
-        public void RenderChunk(VoxelModel model, Vector3Int chunkKey)
+        public void UpdateChunk(VoxelModel model, Vector3Int chunkKey)
         {
-            if (!activeChunks.ContainsKey(chunkKey))
+            if (!chunks.ContainsKey(chunkKey))
             {
-                AddChunk(chunkKey);
+                chunks[chunkKey] = Instantiate(chunkPrefab, transform).GetComponent<MeshFilter>();
             }
 
-            MeshFilter meshFilter = activeChunks[chunkKey];
+            MeshFilter meshFilter = chunks[chunkKey];
             BuildChunk(meshFilter, model, chunkKey);
         }
-
-        private void AddChunk(Vector3Int chunkKey)
-        {
-            if (!inactiveChunks.Any())
-            {
-                inactiveChunks.Add(Instantiate(chunkPrefab, transform).GetComponent<MeshFilter>());
-            }
-            MeshFilter chunk = inactiveChunks[0];
-            chunk.gameObject.SetActive(true);
-            activeChunks[chunkKey] = chunk;
-            inactiveChunks.RemoveAt(0);
-        }
-
+      
         private void BuildChunk(MeshFilter meshFilter, VoxelModel model, Vector3Int chunkKey)
         {
             List<Vector3> vertices = new();
@@ -46,54 +33,79 @@ namespace Game.Map
                 {
                     for (int z = chunkKey.x; z < chunkKey.z + VoxelModel.chunkSize; z++)
                     {
-                        Vector3Int offset = new Vector3Int(x, y, z);
-                        int chunkValue = model.GetValue(chunkKey + offset);
+                        Vector3Int position = new Vector3Int(x, y, z);
+                        uint chunkValue = (uint) model.GetValue(position);
 
                         if(chunkValue == 0)
                         {
                             continue;
                         }
 
-                        if(model.GetValue(chunkKey + offset + Vector3Int.back) != 0)
+                        int vertexCount = vertices.Count;
+
+                        if(model.GetValue(position + Vector3Int.back) == 0)
                         {
-                            vertices.Add(offset);
-                            vertices.Add(offset + Vector3.up);
-                            vertices.Add(offset + Vector3.up + Vector3.right);
-                            vertices.Add(offset + Vector3.right);
+                            vertices.Add(position);
+                            vertices.Add(position + Vector3.up);
+                            vertices.Add(position + Vector3.up + Vector3.right);
+                            vertices.Add(position + Vector3.right);
                         }
 
-                        if (model.GetValue(chunkKey + offset + Vector3Int.up) != 0)
+                        if (model.GetValue(position + Vector3Int.up) == 0)
                         {
-                            vertices.Add(offset + Vector3.up);
-                            vertices.Add(offset + Vector3.up + Vector3.forward);
-                            vertices.Add(offset + Vector3.up + Vector3.forward + Vector3.right);
-                            vertices.Add(offset + Vector3.up + Vector3.right);
+                            vertices.Add(position + Vector3.up);
+                            vertices.Add(position + Vector3.up + Vector3.forward);
+                            vertices.Add(position + Vector3.up + Vector3.forward + Vector3.right);
+                            vertices.Add(position + Vector3.up + Vector3.right);
                         }
 
-                        if (model.GetValue(chunkKey + offset + Vector3Int.forward) != 0)
+                        if (model.GetValue(position + Vector3Int.forward) == 0)
                         {
-                            vertices.Add(offset + Vector3.forward + Vector3.right);
-                            vertices.Add(offset + Vector3.forward + Vector3.right + Vector3.up);
-                            vertices.Add(offset + Vector3.forward + Vector3.up);
-                            vertices.Add(offset + Vector3.forward);
+                            vertices.Add(position + Vector3.forward + Vector3.right);
+                            vertices.Add(position + Vector3.forward + Vector3.right + Vector3.up);
+                            vertices.Add(position + Vector3.forward + Vector3.up);
+                            vertices.Add(position + Vector3.forward);
                         }
 
-                        if (model.GetValue(chunkKey + offset + Vector3Int.down) != 0)
+                        if (model.GetValue(position + Vector3Int.down) == 0)
                         {
-                            vertices.Add(offset + Vector3.forward);
-                            vertices.Add(offset);
-                            vertices.Add(offset + Vector3.right);
-                            vertices.Add(offset + Vector3.forward + Vector3.right);
+                            vertices.Add(position + Vector3.forward);
+                            vertices.Add(position);
+                            vertices.Add(position + Vector3.right);
+                            vertices.Add(position + Vector3.forward + Vector3.right);
                         }
 
-                        if (model.GetValue(chunkKey + offset + Vector3Int.left) != 0)
+                        if (model.GetValue(position + Vector3Int.left) == 0)
                         {
-                            /*
-                            vertices.Add(offset + Vector3.forward);
-                            vertices.Add(offset + Vector3.forward + Vector3.up);
-                            vertices.Add(offset + Vector3.right);
-                            vertices.Add(offset + Vector3.forward + Vector3.right);
-                            */
+                            vertices.Add(position + Vector3.forward);
+                            vertices.Add(position + Vector3.forward + Vector3.up);
+                            vertices.Add(position + Vector3.up);
+                            vertices.Add(position);
+                        }
+
+                        if (model.GetValue(position + Vector3Int.right) == 0)
+                        {
+                            vertices.Add(position + Vector3.right);
+                            vertices.Add(position + Vector3.right + Vector3.up);
+                            vertices.Add(position + Vector3.right + Vector3.forward + Vector3.up);
+                            vertices.Add(position + Vector3.right + Vector3.forward);
+                        }
+
+                        int addedVertices = vertices.Count - vertexCount;
+                        Color voxelColor = new Color(
+                             (chunkValue >> 24) / 255f,
+                             ((chunkValue >> 16) & 255) / 255f,
+                             ((chunkValue >> 8) & 255) / 255f,
+                             (chunkValue & 255) / 255f
+                        );
+                        Color.RGBToHSV(voxelColor, out float h, out float s, out float v);
+                        System.Random random = new System.Random(position.GetHashCode());
+                        v = Mathf.Clamp01(random.Next((int)(v * 100) - 50, (int)(v * 100) + 50)/100f);
+                        voxelColor = Color.HSVToRGB(h, s, v);
+
+                        for(int i = 0; i<addedVertices; i++)
+                        {
+                            colors.Add(voxelColor);
                         }
                     }
                 }
@@ -112,6 +124,7 @@ namespace Game.Map
             meshFilter.mesh.SetVertices(vertices);
             meshFilter.mesh.SetTriangles(triangles, 0);
             meshFilter.mesh.SetColors(colors);
+            meshFilter.mesh.RecalculateNormals();
         }
     }
 }
