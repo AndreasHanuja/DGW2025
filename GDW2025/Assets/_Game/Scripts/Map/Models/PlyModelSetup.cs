@@ -86,6 +86,7 @@ namespace Game.Map.Models
                     int normedZ = block[2] - minZ;
 
                     content[0].data[normedX, normedY, normedZ] = block[3];
+                    content[4].data[normedZ, normedY, normedX] = block[3];
 
                     for (int i = 1; i < 4; i++)
                     {
@@ -96,6 +97,7 @@ namespace Game.Map.Models
                         normedZ = newZ;
 
                         content[i].data[normedX, normedY, normedZ] = block[3];
+                        content[i+4].data[normedZ, normedY, normedX] = block[3];
                     }
 
                 }
@@ -108,10 +110,14 @@ namespace Game.Map.Models
 
             if (Application.isPlaying)
             {
-                VoxelPresenter.Instance.SetStructure(Vector3Int.zero, content[0].data);
-                VoxelPresenter.Instance.SetStructure(new Vector3Int(16, 0, 0), content[1].data);
-                VoxelPresenter.Instance.SetStructure(new Vector3Int(32, 0, 0), content[2].data);
-                VoxelPresenter.Instance.SetStructure(new Vector3Int(48, 0, 0), content[3].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(Vector3Int.zero, content[0].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(16, 0, 0), content[1].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(32, 0, 0), content[2].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(48, 0, 0), content[3].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(64, 0, 0), content[4].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(80, 0, 0), content[5].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(96, 0, 0), content[6].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(112, 0, 0), content[7].data);
             }
         }
     }
