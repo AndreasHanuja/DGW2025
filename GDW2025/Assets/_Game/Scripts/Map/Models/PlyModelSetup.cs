@@ -11,7 +11,7 @@ namespace Game.Map.Models
     public class PlyModelSetup : ScriptableObject
     {
         [SerializeField] private string filepath;
-        private List<PlyModelPrefab> content = new List<PlyModelPrefab>();
+        public List<PlyModelPrefab> content = new List<PlyModelPrefab>();
 
         public void LoadModel()
         {
