@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
-namespace Game.Map
+namespace Game.Map.Voxel
 {
     public class VoxelView : MonoBehaviour
     {

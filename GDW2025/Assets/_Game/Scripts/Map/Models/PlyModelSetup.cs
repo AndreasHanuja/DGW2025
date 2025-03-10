@@ -1,3 +1,4 @@
+using Game.Map.Voxel;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -30,12 +31,13 @@ namespace Game.Map.Models
                     {
                         string[] werte = line.Split(' ');
 
-                        int xCord = int.Parse(werte[0]);
-                        int yCord = int.Parse(werte[1]);
-                        int zCord = int.Parse(werte[2]);
+                        int xCord = Mathf.Clamp(int.Parse(werte[0]) + 8, 0, 15);
+                        int yCord = Mathf.Clamp(int.Parse(werte[1]) + 8, 0, 15);
+                        int zCord = Mathf.Clamp(int.Parse(werte[2]) + 8, 0, 15);
                         int r = int.Parse(werte[3]);
                         int g = int.Parse(werte[4]);
                         int b = int.Parse(werte[5]);
+
 
                         content[0].data[xCord, yCord, zCord] = (r << 24) + (g << 16) + (b << 8) + 255;
 
@@ -55,7 +57,7 @@ namespace Game.Map.Models
 
             if (Application.isPlaying)
             {
-                VoxelPresenter.Instance.SetStructure(Vector3Int.zero, content[0].data);
+                VoxelPresenter.Instance.AnimateStructure(Vector3Int.zero, content[0].data, 3);
             }
         }
     }

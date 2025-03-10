@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-namespace Game.Map
+namespace Game.Map.Voxel
 {
     public class VoxelModel : MonoBehaviour
     {
