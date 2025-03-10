@@ -1,9 +1,11 @@
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Game.Map.Models
 {
+    [Serializable]
     public class PlyModelPrefab
     {
         public const int modelSize = 16;
@@ -20,6 +22,7 @@ namespace Game.Map.Models
         public string[] seitenHashs = new string[6];
 
         public List<int> allowedInputs = new List<int>();
+        public int collapsePriority;
 
         public PlyModel Instantiate(Vector3Int offset)
         {

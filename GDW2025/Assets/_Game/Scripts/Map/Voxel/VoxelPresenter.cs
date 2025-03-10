@@ -1,4 +1,6 @@
 using DG.Tweening;
+using Game.Map.Models;
+using Game.Map.WFC;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,6 +21,10 @@ namespace Game.Map.Voxel
 
             Instance = this;
         }
+        private void Start()
+        {
+            WFCPresenter.Instance.OnModelUpdated += ModelUpdatedHandler;
+        }
 
         private void OnEnable()
         {
@@ -27,6 +33,8 @@ namespace Game.Map.Voxel
         private void OnDisable()
         {
             model.OnChunkUpdated -= UpdateChunkHandler;
+            WFCPresenter.Instance.OnModelUpdated -= ModelUpdatedHandler;
+
         }
 
         public void SetValue(Vector3Int position, int value)
@@ -87,6 +95,10 @@ namespace Game.Map.Voxel
         private void UpdateChunkHandler(Vector3Int chunkKey)
         {
             view.UpdateChunk(model, chunkKey);
+        }
+        private void ModelUpdatedHandler(PlyModel plyModel)
+        {
+            SetStructure(plyModel.offset, plyModel.prefab.data);
         }
     }
 }

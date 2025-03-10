@@ -1,4 +1,5 @@
 using Game.Map.Models;
+using Game.Map.Voxel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace Game.Map.WFC
         public void SetOutput(Vector3Int position, byte value)
         {
             outputData[position.x, position.y, position.z] = value;
-            OnOutputChange?.Invoke(position, value);
+            OnOutputChange?.Invoke(position * PlyModelPrefab.modelSize, value);
         }
         public byte GetInput(Vector3Int position)
         {
@@ -43,7 +44,7 @@ namespace Game.Map.WFC
 
         public void SetPrefabs(List<PlyModelPrefab> prefabs)
         {
-            prefabs = prefabs.ToList();
+            this.prefabs = prefabs.ToList();
         }
         public List<PlyModelPrefab> GetPrefabs()
         {

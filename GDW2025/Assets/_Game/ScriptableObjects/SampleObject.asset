@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a7a95d6db77a944b8dd31d3832af658, type: 3}
   m_Name: SampleObject
   m_EditorClassIdentifier: 
-  filepath: .Models/test_interpreter.ply
+  filepath: .Models/turm.ply

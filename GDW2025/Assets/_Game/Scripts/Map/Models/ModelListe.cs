@@ -1,7 +1,7 @@
 using Game.Map.Models;
-using NUnit.Framework;
+using Game.Map.WFC;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using UnityEngine;
 
 public class ModelListe : MonoBehaviour
@@ -19,6 +19,19 @@ public class ModelListe : MonoBehaviour
                 prefabs.Add(setup.content[i]);
             }
         }
-    }
 
+        prefabs.OrderBy(p => -p.collapsePriority);
+
+        PlyModelPrefab emptyPrefab = new PlyModelPrefab();
+        emptyPrefab.seitenHashs[0] = "26103cb22a73b4df6e6fddb6a34f2b62dae95d0e7a9a5e975ace20f5fcd683dc";
+        emptyPrefab.seitenHashs[1] = "26103cb22a73b4df6e6fddb6a34f2b62dae95d0e7a9a5e975ace20f5fcd683dc";
+        emptyPrefab.seitenHashs[2] = "26103cb22a73b4df6e6fddb6a34f2b62dae95d0e7a9a5e975ace20f5fcd683dc";
+        emptyPrefab.seitenHashs[3] = "26103cb22a73b4df6e6fddb6a34f2b62dae95d0e7a9a5e975ace20f5fcd683dc";
+        emptyPrefab.seitenHashs[4] = "26103cb22a73b4df6e6fddb6a34f2b62dae95d0e7a9a5e975ace20f5fcd683dc";
+        emptyPrefab.seitenHashs[5] = "26103cb22a73b4df6e6fddb6a34f2b62dae95d0e7a9a5e975ace20f5fcd683dc";
+        emptyPrefab.allowedInputs.Add(0);
+
+        prefabs.Add(emptyPrefab);
+        WFCPresenter.Instance.SetPlyModelPrefabs(prefabs);
+    }
 }

@@ -1,16 +1,17 @@
 using Game.Map.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
-using static UnityEditor.Rendering.CameraUI;
-using UnityEngine.UIElements;
 
 namespace Game.Map.WFC
 {
     public class WFCPresenter : MonoBehaviour
     {
-        public event Action<PlyModel> OnModelUpdated;
+        public event Action<PlyModel> OnModelUpdated; 
 
+        public static WFCPresenter Instance;
         private WFCView view;
         private WFCModel model;
 
@@ -18,6 +19,8 @@ namespace Game.Map.WFC
         {
             view = GetComponent<WFCView>();
             model = GetComponent<WFCModel>();
+
+            Instance = this;
         }
 
         private void OnEnable()
@@ -31,7 +34,7 @@ namespace Game.Map.WFC
 
         private void OutputUpdateHandler(Vector3Int position, byte output)
         {
-            OnModelUpdated?.Invoke();
+            OnModelUpdated?.Invoke(model.GetPrefabs()[output].Instantiate(position));
         }
 
         public void SetInput(Vector3Int position, byte value)
@@ -48,6 +51,8 @@ namespace Game.Map.WFC
         public void SetPlyModelPrefabs(List<PlyModelPrefab> prefabs)
         {
             model.SetPrefabs(prefabs);
+
+            RecalculateOutput(model.GetInputData(), model.GetPrefabs());
         }
 
         private void RecalculateOutput(byte[,,] inputData, List<PlyModelPrefab> prefabs)
@@ -61,7 +66,6 @@ namespace Game.Map.WFC
             InitPositions(openPositions, possibilities);
             HashSet<Vector3Int> uncollapsedPositions = openPositions.ToHashSet();
 
-            //while bis alle kollabiert sind
             while (uncollapsedPositions.Any())
             {
                 Vector3Int currentValue;
@@ -91,8 +95,7 @@ namespace Game.Map.WFC
             }
 
             Output(possibilities);
-            //jede Zelle hat eine possibility -> die dann auswählen falls sie vom gespeicherten output abweicht
-        }
+        } //TODO CALLEN
 
         private void Init(HashSet<byte>[,,] possibilities, byte[,,] inputData, List<PlyModelPrefab> prefabs)
         {
@@ -132,10 +135,22 @@ namespace Game.Map.WFC
                 }
             }
         }
-        /*TODO*/private void CellCollapse(Vector3Int position, HashSet<byte> possibilities, HashSet<Vector3Int> openPositions)
+        private void CellCollapse(Vector3Int position, HashSet<byte> possibilities, HashSet<Vector3Int> openPositions)
         {
-            //nach priority sortiert
-            //kollabiere position zu possibility & nachbarn zu openPositions hinzufügen
+            List<PlyModelPrefab> prefabs = model.GetPrefabs();
+            int priorityClass = prefabs[possibilities.First()].collapsePriority;
+
+            possibilities.RemoveWhere(p => prefabs[p].collapsePriority != priorityClass);
+            System.Random random = new System.Random(position.GetHashCode());
+            byte selectedPossibility = (byte)random.Next(possibilities.Count);
+
+            possibilities.Clear();
+            possibilities.Add(selectedPossibility);
+
+            foreach(Vector3Int neighbor in GetNeighbours(position))
+            {
+                openPositions.Add(neighbor);
+            }
         }
         private bool CheckPossibility(HashSet<byte>[,,] possibilities, byte possibility, Vector3Int position)
         {
