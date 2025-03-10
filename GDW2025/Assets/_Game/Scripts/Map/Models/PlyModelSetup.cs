@@ -2,17 +2,17 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace Game.Map
+namespace Game.Map.Models
 {
     [CreateAssetMenu(fileName = "PlyModel", menuName = "ScriptableObjects/PlyModel", order = 1)]
-    public class PlyModel : ScriptableObject
+    public class PlyModelSetup : ScriptableObject
     {
         [SerializeField] private string filepath;
-        private List<int[,,]> content = new List<int[,,]>();
+        private List<PlyModelPrefab> content = new List<PlyModelPrefab>();
 
         public void LoadModel()
         {
-            content.Add(new int[16, 16, 16]);
+            content.Add(new PlyModelPrefab());
             string fullPath = Path.Combine(Application.dataPath, filepath);
             string[] fileData = { };
 
@@ -37,7 +37,7 @@ namespace Game.Map
                         int g = int.Parse(werte[4]);
                         int b = int.Parse(werte[5]);
 
-                        content[0][xCord, yCord, zCord] = (r << 24) + (g << 16) + (b << 8) + 255;
+                        content[0].data[xCord, yCord, zCord] = (r << 24) + (g << 16) + (b << 8) + 255;
 
                     }
 
@@ -53,6 +53,10 @@ namespace Game.Map
                 Debug.LogError($"Datei nicht gefunden: {fullPath}");
             }
 
+            if (Application.isPlaying)
+            {
+                VoxelPresenter.Instance.SetStructure(Vector3Int.zero, content[0].data);
+            }
         }
     }
 }

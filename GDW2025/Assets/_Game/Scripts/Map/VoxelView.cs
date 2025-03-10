@@ -6,6 +6,7 @@ namespace Game.Map
 {
     public class VoxelView : MonoBehaviour
     {
+        [SerializeField, Range(0, 1)] private float randomColorRange = 0.1f;
         [SerializeField] private GameObject chunkPrefab;
 
         private Dictionary<Vector3Int, MeshFilter> chunks = new();
@@ -100,7 +101,7 @@ namespace Game.Map
                         );
                         Color.RGBToHSV(voxelColor, out float h, out float s, out float v);
                         System.Random random = new System.Random(position.GetHashCode());
-                        v = Mathf.Clamp01(random.Next((int)(v * 100) - 50, (int)(v * 100) + 50)/100f);
+                        v = Mathf.Clamp01(random.Next((int)((v - randomColorRange) * 100), (int)((v + randomColorRange) * 100)) / 100f);
                         voxelColor = Color.HSVToRGB(h, s, v);
 
                         for(int i = 0; i<addedVertices; i++)

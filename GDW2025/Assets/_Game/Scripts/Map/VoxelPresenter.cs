@@ -5,6 +5,8 @@ namespace Game.Map
     [RequireComponent(typeof(VoxelModel)), RequireComponent(typeof(VoxelView))]
     public class VoxelPresenter : MonoBehaviour
     {
+        public static VoxelPresenter Instance;
+
         private VoxelModel model;
         private VoxelView view;
 
@@ -12,6 +14,8 @@ namespace Game.Map
         {
             model = GetComponent<VoxelModel>();
             view = GetComponent<VoxelView>();
+
+            Instance = this;
         }
 
         private void OnEnable()
@@ -27,7 +31,7 @@ namespace Game.Map
         {
             model.SetValue(position, value);
         }
-        public void SetStrucute(Vector3Int position, int[,,] values)
+        public void SetStructure(Vector3Int position, int[,,] values)
         {
             for(int x = 0; x < values.GetLength(0); x++)
             {
