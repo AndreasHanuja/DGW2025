@@ -29,9 +29,9 @@ namespace Game.Map.Voxel
 
             for(int x = chunkKey.x; x < chunkKey.x + VoxelModel.chunkSize; x++)
             {
-                for (int y = chunkKey.x; y < chunkKey.y + VoxelModel.chunkSize; y++)
+                for (int y = chunkKey.y; y < chunkKey.y + VoxelModel.chunkSize; y++)
                 {
-                    for (int z = chunkKey.x; z < chunkKey.z + VoxelModel.chunkSize; z++)
+                    for (int z = chunkKey.z; z < chunkKey.z + VoxelModel.chunkSize; z++)
                     {
                         Vector3Int position = new Vector3Int(x, y, z);
                         uint chunkValue = (uint) model.GetValue(position);
