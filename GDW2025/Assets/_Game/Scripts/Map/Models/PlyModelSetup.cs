@@ -1,7 +1,9 @@
-using Game.Map.Voxel;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using System;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Game.Map.Models
 {
@@ -9,7 +11,7 @@ namespace Game.Map.Models
     public class PlyModelSetup : ScriptableObject
     {
         [SerializeField] private string filepath;
-        private List<PlyModelPrefab> content = new List<PlyModelPrefab>();
+        public List<PlyModelPrefab> content = new List<PlyModelPrefab>();
 
         public void LoadModel()
         {
@@ -87,6 +89,7 @@ namespace Game.Map.Models
                     int normedZ = block[2] - minZ;
 
                     content[0].data[normedX, normedY, normedZ] = block[3];
+                    content[4].data[normedZ, normedY, normedX] = block[3];
 
                     for (int i = 1; i < 4; i++)
                     {
@@ -97,6 +100,7 @@ namespace Game.Map.Models
                         normedZ = newZ;
 
                         content[i].data[normedX, normedY, normedZ] = block[3];
+                        content[i+4].data[normedZ, normedY, normedX] = block[3];
                     }
 
                 }
@@ -109,11 +113,84 @@ namespace Game.Map.Models
 
             if (Application.isPlaying)
             {
-                VoxelPresenter.Instance.AnimateStructure(Vector3Int.zero, content[0].data, 5);
-                VoxelPresenter.Instance.AnimateStructure(new Vector3Int(32, 0, 0), content[1].data, 5);
-                VoxelPresenter.Instance.AnimateStructure(new Vector3Int(64, 0, 0), content[2].data, 5);
-                VoxelPresenter.Instance.AnimateStructure(new Vector3Int(96, 0, 0), content[3].data, 5);
+                Voxel.VoxelPresenter.Instance.SetStructure(Vector3Int.zero, content[0].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(16, 0, 0), content[1].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(32, 0, 0), content[2].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(48, 0, 0), content[3].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(64, 0, 0), content[4].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(80, 0, 0), content[5].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(96, 0, 0), content[6].data);
+                Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(112, 0, 0), content[7].data);
             }
         }
+
+        public void setHashs()
+        {
+            int[,] colorData = new int[content[0].data.GetLength(0), content[0].data.GetLength(0)];
+
+            for (int modell = 0; modell < 8; modell++)
+            {
+
+                for (int z = 0; z < content[0].data.GetLength(0); z += content[0].data.GetLength(0) - 1)
+                {
+                    for (int x = 0; x < content[0].data.GetLength(0); x++)
+                    {
+                        for (int y = 0; y < content[0].data.GetLength(0); y++)
+                        {
+                            colorData[x, y] = content[modell].data[x, y, z];
+                        }
+                    }
+
+                    content[modell].seitenHashs[z / 15] = ComputeSha256Hash(colorData);
+
+                }
+
+                for (int z = 0; z < content[0].data.GetLength(0); z += content[0].data.GetLength(0) - 1)
+                {
+                    for (int x = 0; x < content[0].data.GetLength(0); x++)
+                    {
+                        for (int y = 0; y < content[0].data.GetLength(0); y++)
+                        {
+                            colorData[x, y] = content[modell].data[x, z, y];
+                        }
+                    }
+
+                    content[modell].seitenHashs[2 + (z / 15)] = ComputeSha256Hash(colorData);
+
+                }
+
+                for (int z = 0; z < content[0].data.GetLength(0); z += content[0].data.GetLength(0) - 1)
+                {
+                    for (int x = 0; x < content[0].data.GetLength(0); x++)
+                    {
+                        for (int y = 0; y < content[0].data.GetLength(0); y++)
+                        {
+                            colorData[x, y] = content[modell].data[z, x, y];
+                        }
+                    }
+
+                    content[modell].seitenHashs[4 + (z / 15)] = ComputeSha256Hash(colorData);
+
+                }
+            } 
+        }
+
+        public static string ComputeSha256Hash(int[,] colorData)
+        {
+            int width = colorData.GetLength(0);
+            int height = colorData.GetLength(1);
+
+            // Byte-Array für die Farbwerte (Jeder int -> 4 Bytes)
+            byte[] bytes = new byte[width * height * 4];
+            Buffer.BlockCopy(colorData, 0, bytes, 0, bytes.Length);
+
+            // SHA256-Hash berechnen
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] hashBytes = sha256.ComputeHash(bytes);
+                return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+            }
+        }
+
     }
 }
