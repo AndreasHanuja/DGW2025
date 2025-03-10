@@ -9,5 +9,6 @@ namespace Game.Map.Models
         public int[,,] data = new int[modelSize, modelSize, modelSize];
 
         public List<int> allowedInputs = new List<int>();
+        public int collapsePriority;
     }
 }

@@ -1,13 +1,15 @@
 using Game.Map.Models;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using static UnityEditor.Rendering.CameraUI;
+using UnityEngine.UIElements;
 
 namespace Game.Map.WFC
 {
     public class WFCPresenter : MonoBehaviour
     {
-        //public event Action<Vector3Int, PlyModel> OnModelUpdated;
+        public event Action<PlyModel> OnModelUpdated;
 
         private WFCView view;
         private WFCModel model;
@@ -16,6 +18,20 @@ namespace Game.Map.WFC
         {
             view = GetComponent<WFCView>();
             model = GetComponent<WFCModel>();
+        }
+
+        private void OnEnable()
+        {
+            model.OnOutputChange += OutputUpdateHandler;
+        }
+        private void OnDisable()
+        {
+            model.OnOutputChange -= OutputUpdateHandler;
+        }
+
+        private void OutputUpdateHandler(Vector3Int position, byte output)
+        {
+            OnModelUpdated?.Invoke();
         }
 
         public void SetInput(Vector3Int position, byte value)
@@ -34,26 +50,61 @@ namespace Game.Map.WFC
             model.SetPrefabs(prefabs);
         }
 
-        /// <summary>
-        /// Führt die Wave Function Collapse aus: Jede Zelle im 3D-Gitter besitzt anfänglich alle möglichen Tile-IDs.
-        /// Feste Eingaben (inputData != 0) werden fixiert. Anschließend wird in einer Schleife der Zustand mit
-        /// minimaler Entropie ausgewählt, kollabiert und mittels Constraint–Propagation die Umgebung aktualisiert.
-        /// </summary>
         private void RecalculateOutput(byte[,,] inputData, List<PlyModelPrefab> prefabs)
         {
             int size = WFCModel.worldSize;
-            byte[,,] outputData = new byte[size, size, size];
+            HashSet<byte>[,,] possibilities = new HashSet<byte>[size, size, size];
 
-            // Erzeuge für jede Zelle eine Liste möglicher Tile-IDs.
-            List<byte>[,,] possibilities = new List<byte>[size, size, size];
+            Init(possibilities, inputData, prefabs);
+
+            HashSet<Vector3Int> openPositions = new();
+            InitPositions(openPositions, possibilities);
+            HashSet<Vector3Int> uncollapsedPositions = openPositions.ToHashSet();
+
+            //while bis alle kollabiert sind
+            while (uncollapsedPositions.Any())
+            {
+                Vector3Int currentValue;
+                HashSet<byte> currentPossibilities;
+                while (openPositions.Any())
+                {
+                    currentValue = openPositions.ElementAt(0);
+                    openPositions.Remove(currentValue);
+
+                    currentPossibilities = possibilities[currentValue.x, currentValue.y, currentValue.z];
+                    foreach(byte possibility in currentPossibilities.ToList())
+                    {
+                        if (CheckPossibility(possibilities, possibility, currentValue))
+                        {
+                            continue;
+                        }
+                        currentPossibilities.Remove(possibility);
+                        foreach(Vector3Int neighbor in GetNeighbours(currentValue))
+                        {
+                            openPositions.Add(neighbor);
+                        }
+                    }
+                }
+                currentValue = uncollapsedPositions.ElementAt(0);
+                uncollapsedPositions.Remove(currentValue);
+                CellCollapse(currentValue, possibilities[currentValue.x, currentValue.y, currentValue.z], openPositions);
+            }
+
+            Output(possibilities);
+            //jede Zelle hat eine possibility -> die dann auswählen falls sie vom gespeicherten output abweicht
+        }
+
+        private void Init(HashSet<byte>[,,] possibilities, byte[,,] inputData, List<PlyModelPrefab> prefabs)
+        {
+            int size = WFCModel.worldSize;
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
                 {
                     for (int z = 0; z < size; z++)
                     {
-                        possibilities[x, y, z] = new List<byte>();
-                        for (byte i = 0; i < prefabs.Count; i++) 
+                        possibilities[x, y, z] = new HashSet<byte>();
+                        for (byte i = 0; i < prefabs.Count; i++)
                         {
                             if (prefabs[i].allowedInputs.Contains(inputData[x, y, z]))
                             {
@@ -63,156 +114,91 @@ namespace Game.Map.WFC
                     }
                 }
             }
-
-            // Erzeuge eine Queue zur Constraint–Propagation.
-            Queue<Vector3Int> propagationQueue = new Queue<Vector3Int>();
-            // Alle fixierten Zellen (mit nur einer Möglichkeit) werden in die Queue aufgenommen.
+        }
+        private void InitPositions(HashSet<Vector3Int> openPositions, HashSet<byte>[,,] possibilities)
+        {
+            int size = WFCModel.worldSize;
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
                 {
                     for (int z = 0; z < size; z++)
                     {
-                        if (possibilities[x, y, z].Count == 1)
+                        if (possibilities[x, y, z].Count > 1)
                         {
-                            propagationQueue.Enqueue(new Vector3Int(x, y, z));
-                        }
+                            openPositions.Add(new Vector3Int(x, y, z));
+                        }    
                     }
                 }
             }
+        }
+        /*TODO*/private void CellCollapse(Vector3Int position, HashSet<byte> possibilities, HashSet<Vector3Int> openPositions)
+        {
+            //nach priority sortiert
+            //kollabiere position zu possibility & nachbarn zu openPositions hinzufügen
+        }
+        private bool CheckPossibility(HashSet<byte>[,,] possibilities, byte possibility, Vector3Int position)
+        {
+            List<PlyModelPrefab> prefabs = model.GetPrefabs();
+            PlyModelPrefab myPrefab = prefabs[possibility];
 
-            System.Random rnd = new System.Random(0);
-
-            // Hauptschleife: solange es noch Zellen gibt, die nicht kollabiert sind.
-            while (true)
+            foreach (Vector3Int neighbor in GetNeighbours(position))
             {
-                bool allCollapsed = true;
-                Vector3Int cellToCollapse = new Vector3Int();
-                int minEntropy = int.MaxValue;
-
-                // Finde die Zelle mit der geringsten Anzahl an Möglichkeiten (aber >1)
-                for (int x = 0; x < size; x++)
+                bool matchAny = false;
+                foreach(byte possibilityNeighbor in possibilities[neighbor.x, neighbor.y, neighbor.z])
                 {
-                    for (int y = 0; y < size; y++)
+                    if (myPrefab.CheckConnectivity(model.GetPrefabs()[possibilityNeighbor], neighbor - position))
                     {
-                        for (int z = 0; z < size; z++)
-                        {
-                            int count = possibilities[x, y, z].Count;
-                            if (count > 1)
-                            {
-                                allCollapsed = false;
-                                if (count < minEntropy)
-                                {
-                                    minEntropy = count;
-                                    cellToCollapse = new Vector3Int(x, y, z);
-                                }
-                            }
-                        }
+                        matchAny = true;
+                        break;
                     }
                 }
-
-                // Sind alle Zellen kollabiert, so beenden wir die Schleife.
-                if (allCollapsed)
-                    break;
-
-                // Kollabiere die ausgewählte Zelle: wähle zufällig einen möglichen Wert.
-                List<byte> cellPoss = possibilities[cellToCollapse.x, cellToCollapse.y, cellToCollapse.z];
-                byte chosen = cellPoss[rnd.Next(cellPoss.Count)];
-                possibilities[cellToCollapse.x, cellToCollapse.y, cellToCollapse.z].Clear();
-                possibilities[cellToCollapse.x, cellToCollapse.y, cellToCollapse.z].Add(chosen);
-                propagationQueue.Enqueue(cellToCollapse);
-
-                // Constraint–Propagation: Aktualisiere alle Nachbarzellen.
-                while (propagationQueue.Count > 0)
+                if (!matchAny)
                 {
-                    Vector3Int pos = propagationQueue.Dequeue();
-                    // Da diese Zelle bereits kollabiert ist, enthält sie nur einen Wert:
-                    byte collapsedValue = possibilities[pos.x, pos.y, pos.z][0];
-
-                    foreach (var neighbor in GetNeighbors(pos, size))
-                    {
-                        List<byte> neighborPoss = possibilities[neighbor.x, neighbor.y, neighbor.z];
-                        int beforeCount = neighborPoss.Count;
-                        List<byte> allowed = new List<byte>();
-
-                        // Für jede Möglichkeit im Nachbarn prüfen wir, ob sie kompatibel ist.
-                        foreach (byte possibility in neighborPoss)
-                        {
-                            if (IsCompatible(collapsedValue, possibility))
-                            {
-                                allowed.Add(possibility);
-                            }
-                        }
-
-                        if (allowed.Count < neighborPoss.Count)
-                        {
-                            possibilities[neighbor.x, neighbor.y, neighbor.z] = allowed;
-                            // Falls ein Widerspruch entsteht (keine Möglichkeit mehr vorhanden), wird hier vereinfacht ein Reset durchgeführt.
-                            if (allowed.Count == 0)
-                            {
-                                foreach (var prefab in prefabs)
-                                {
-                                    //allowed.Add(prefab.Value);
-                                }
-                                possibilities[neighbor.x, neighbor.y, neighbor.z] = allowed;
-                            }
-                            propagationQueue.Enqueue(neighbor);
-                        }
-                    }
+                    return false;
                 }
             }
+            return true;
+        }
+        private HashSet<Vector3Int> GetNeighbours(Vector3Int position)
+        {
+            HashSet<Vector3Int> output = new();
+            output.Add(NeighbourHelper(position + Vector3Int.forward));
+            output.Add(NeighbourHelper(position + Vector3Int.back));
+            output.Add(NeighbourHelper(position + Vector3Int.left));
+            output.Add(NeighbourHelper(position + Vector3Int.right));
+            output.Add(NeighbourHelper(position + Vector3Int.up));
+            output.Add(NeighbourHelper(position + Vector3Int.down));
+            output.Remove(position);
 
-            // Erstelle das finale OutputData-Array und informiere per Event über die Aktualisierung.
+            return output;
+        }
+        private Vector3Int NeighbourHelper(Vector3Int position)
+        {
+            return new Vector3Int(
+                Mathf.Clamp(position.x, 0, WFCModel.worldSize - 1),
+                Mathf.Clamp(position.y, 0, WFCModel.worldSize - 1),
+                Mathf.Clamp(position.z, 0, WFCModel.worldSize - 1)
+            );
+        }
+        private void Output(HashSet<byte>[,,] possibilities)
+        {
+            int size = WFCModel.worldSize;
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
                 {
                     for (int z = 0; z < size; z++)
                     {
-                        outputData[x, y, z] = possibilities[x, y, z][0];
-                        //OnModelUpdated?.Invoke(new Vector3Int(x, y, z), new PlyModel(outputData[x, y, z]));
+                        byte output = possibilities[x, y, z].First();
+                        Vector3Int position = new Vector3Int(x, y, z);
+                        if (model.GetOutput(position) != output)
+                        {
+                            model.SetOutput(position, output);
+                        }
                     }
                 }
             }
-
-            // Optional: Das berechnete OutputData kann im Model gespeichert oder an die View weitergereicht werden.
-            //model.OutputData = outputData;
-        }
-
-        /// <summary>
-        /// Liefert alle gültigen Nachbarpositionen (6-Richtungen) einer gegebenen Position zurück.
-        /// </summary>
-        private IEnumerable<Vector3Int> GetNeighbors(Vector3Int pos, int size)
-        {
-            Vector3Int[] directions = new Vector3Int[]
-            {
-                new Vector3Int(1, 0, 0),
-                new Vector3Int(-1, 0, 0),
-                new Vector3Int(0, 1, 0),
-                new Vector3Int(0, -1, 0),
-                new Vector3Int(0, 0, 1),
-                new Vector3Int(0, 0, -1)
-            };
-
-            foreach (var d in directions)
-            {
-                Vector3Int neighbor = pos + d;
-                if (neighbor.x >= 0 && neighbor.x < size &&
-                    neighbor.y >= 0 && neighbor.y < size &&
-                    neighbor.z >= 0 && neighbor.z < size)
-                {
-                    yield return neighbor;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Prüft, ob zwei Tile-Werte kompatibel sind.
-        /// In diesem Beispiel ist die Regel: Zwei Tiles sind kompatibel, wenn ihre Werte sich um höchstens 1 unterscheiden.
-        /// </summary>
-        private bool IsCompatible(byte collapsedValue, byte neighborValue)
-        {
-            return Math.Abs(collapsedValue - neighborValue) <= 1;
         }
     }
 }

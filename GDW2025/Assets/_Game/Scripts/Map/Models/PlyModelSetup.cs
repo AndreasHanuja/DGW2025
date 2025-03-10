@@ -1,3 +1,4 @@
+using Game.Map.Voxel;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -108,10 +109,10 @@ namespace Game.Map.Models
 
             if (Application.isPlaying)
             {
-                VoxelPresenter.Instance.SetStructure(Vector3Int.zero, content[0].data);
-                VoxelPresenter.Instance.SetStructure(new Vector3Int(16, 0, 0), content[1].data);
-                VoxelPresenter.Instance.SetStructure(new Vector3Int(32, 0, 0), content[2].data);
-                VoxelPresenter.Instance.SetStructure(new Vector3Int(48, 0, 0), content[3].data);
+                VoxelPresenter.Instance.AnimateStructure(Vector3Int.zero, content[0].data, 5);
+                VoxelPresenter.Instance.AnimateStructure(new Vector3Int(32, 0, 0), content[1].data, 5);
+                VoxelPresenter.Instance.AnimateStructure(new Vector3Int(64, 0, 0), content[2].data, 5);
+                VoxelPresenter.Instance.AnimateStructure(new Vector3Int(96, 0, 0), content[3].data, 5);
             }
         }
     }
