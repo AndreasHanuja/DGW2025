@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using System;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Game.Map.Models
 {
@@ -120,5 +123,74 @@ namespace Game.Map.Models
                 Voxel.VoxelPresenter.Instance.SetStructure(new Vector3Int(112, 0, 0), content[7].data);
             }
         }
+
+        public void setHashs()
+        {
+            int[,] colorData = new int[content[0].data.GetLength(0), content[0].data.GetLength(0)];
+
+            for (int modell = 0; modell < 8; modell++)
+            {
+
+                for (int z = 0; z < content[0].data.GetLength(0); z += content[0].data.GetLength(0) - 1)
+                {
+                    for (int x = 0; x < content[0].data.GetLength(0); x++)
+                    {
+                        for (int y = 0; y < content[0].data.GetLength(0); y++)
+                        {
+                            colorData[x, y] = content[modell].data[x, y, z];
+                        }
+                    }
+
+                    content[modell].seitenHashs[z / 15] = ComputeSha256Hash(colorData);
+
+                }
+
+                for (int z = 0; z < content[0].data.GetLength(0); z += content[0].data.GetLength(0) - 1)
+                {
+                    for (int x = 0; x < content[0].data.GetLength(0); x++)
+                    {
+                        for (int y = 0; y < content[0].data.GetLength(0); y++)
+                        {
+                            colorData[x, y] = content[modell].data[x, z, y];
+                        }
+                    }
+
+                    content[modell].seitenHashs[2 + (z / 15)] = ComputeSha256Hash(colorData);
+
+                }
+
+                for (int z = 0; z < content[0].data.GetLength(0); z += content[0].data.GetLength(0) - 1)
+                {
+                    for (int x = 0; x < content[0].data.GetLength(0); x++)
+                    {
+                        for (int y = 0; y < content[0].data.GetLength(0); y++)
+                        {
+                            colorData[x, y] = content[modell].data[z, x, y];
+                        }
+                    }
+
+                    content[modell].seitenHashs[4 + (z / 15)] = ComputeSha256Hash(colorData);
+
+                }
+            } 
+        }
+
+        public static string ComputeSha256Hash(int[,] colorData)
+        {
+            int width = colorData.GetLength(0);
+            int height = colorData.GetLength(1);
+
+            // Byte-Array für die Farbwerte (Jeder int -> 4 Bytes)
+            byte[] bytes = new byte[width * height * 4];
+            Buffer.BlockCopy(colorData, 0, bytes, 0, bytes.Length);
+
+            // SHA256-Hash berechnen
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] hashBytes = sha256.ComputeHash(bytes);
+                return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+            }
+        }
+
     }
 }

@@ -15,6 +15,7 @@ namespace Game.Map.Models
             if (GUILayout.Button("Load Model"))
             {
                 plyModel.LoadModel();
+                plyModel.setHashs();
             }
         }
     }
