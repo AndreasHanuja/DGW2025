@@ -11,9 +11,8 @@ namespace Game.Map.Models
     [CreateAssetMenu(fileName = "PlyModel", menuName = "ScriptableObjects/PlyModel", order = 1)]
     public class PlyModelSetup : ScriptableObject
     {
-        [SerializeField] private string filepath;
         [SerializeField] private List<int> allowedInputs;
-        [SerializeField] private int priority;
+        [SerializeField] private float weight;
 
         public List<PlyModelPrefab> createdPrefabs = new List<PlyModelPrefab>();
 
@@ -25,11 +24,11 @@ namespace Game.Map.Models
             {
                 PlyModelPrefab prefab = new PlyModelPrefab();
                 prefab.allowedInputs = allowedInputs.ToList();
-                prefab.collapsePriority = priority;
+                prefab.weight = weight;
                 createdPrefabs.Add(prefab);                
             }
 
-            string fullPath = Path.Combine(Application.dataPath, filepath);
+            string fullPath = Path.Combine(Application.dataPath, ".Models/"+name+".ply");
             string[] fileData = { };
 
             if (File.Exists(fullPath))
@@ -87,9 +86,7 @@ namespace Game.Map.Models
                     createdPrefabs[5].SetData(maxSize - z, y, maxSize - x, block.w);                    //gespiegelt rotiert 90°
                     createdPrefabs[6].SetData(x, y, maxSize - z, block.w);                              //gespiegelt rotiert 180°
                     createdPrefabs[7].SetData(z, y, x, block.w);                                        //gespiegelt rotiert 270°
-                }
-
-                
+                }                
             }
         }
 

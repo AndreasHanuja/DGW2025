@@ -23,7 +23,7 @@ public class ModelListe : MonoBehaviour
             }
         }
 
-        prefabs.OrderBy(p => -p.collapsePriority);
+        prefabs.OrderBy(p => -p.weight);
 
         for(int i =0; i < prefabs.Count; i++)
         {

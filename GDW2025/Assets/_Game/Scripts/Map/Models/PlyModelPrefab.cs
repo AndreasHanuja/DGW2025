@@ -12,9 +12,9 @@ namespace Game.Map.Models
 
         [SerializeField, HideInInspector] public int height;
 
-        public int[] data;
+        [HideInInspector] public int[] data;
         [HideInInspector] public List<int> allowedInputs = new List<int>();
-        [HideInInspector] public int collapsePriority;
+        [HideInInspector] public float weight;
         [HideInInspector] public int id;
 
         public string[] hashes = new string[4]; // north, east, south, west

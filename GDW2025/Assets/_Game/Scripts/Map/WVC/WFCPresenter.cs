@@ -138,14 +138,22 @@ namespace Game.Map.WFC
         private void CellCollapse(Vector2Int position, HashSet<short> possibilities, HashSet<Vector2Int> openPositions)
         {
             List<PlyModelPrefab> prefabs = model.GetPrefabs();
-            int priorityClass = prefabs[possibilities.First()].collapsePriority;
-
-            possibilities.RemoveWhere(p => prefabs[p].collapsePriority != priorityClass);
             System.Random random = new System.Random(position.GetHashCode());
-            short selectedPossibility = possibilities.ElementAt(random.Next(possibilities.Count));
+            IEnumerable<(short, float)> weightsPos = possibilities.Select(p => (p, prefabs[p].weight * random.Next(0, 10000)));
+            
+            short bestPos = -1;
+            float bestWeight = 0;
+            foreach(var t in weightsPos)
+            {
+                if (t.Item2 > bestWeight)
+                {
+                    bestWeight = t.Item2;
+                    bestPos = t.Item1;
+                }
+            }
 
             possibilities.Clear();
-            possibilities.Add(selectedPossibility);
+            possibilities.Add(bestPos);
 
             foreach(Vector2Int neighbor in GetNeighbours(position))
             {
