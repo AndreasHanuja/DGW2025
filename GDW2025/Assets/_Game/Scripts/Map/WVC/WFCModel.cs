@@ -1,5 +1,4 @@
 using Game.Map.Models;
-using Game.Map.Voxel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,35 +8,35 @@ namespace Game.Map.WFC
 {
     public class WFCModel : MonoBehaviour
     {
-        public event Action<Vector3Int, byte> OnOutputChange;
+        public event Action<Vector2Int, short> OnOutputChange;
 
-        public const int worldSize = 16;
+        public const int worldSize = 32;
         private List<PlyModelPrefab> prefabs;
-        private byte[,,] inputData = new byte[worldSize, worldSize, worldSize];
-        private byte[,,] outputData = new byte[worldSize, worldSize, worldSize];
+        private byte[,] inputData = new byte[worldSize, worldSize];
+        private short[,] outputData = new short[worldSize, worldSize];
 
         public void SetPlyModelPrefabs(List<PlyModelPrefab> prefabs)
         {
             this.prefabs = prefabs;
         }
-        public void SetInput(Vector3Int position, byte value)
+        public void SetInput(Vector2Int position, byte value)
         {
-            inputData[position.x, position.y, position.z] = value;
+            inputData[position.x, position.y] = value;
         }
-        public byte GetOutput(Vector3Int position)
+        public short GetOutput(Vector2Int position)
         {
-            return outputData[position.x, position.y, position.z];
+            return outputData[position.x, position.y];
         }
-        public void SetOutput(Vector3Int position, byte value)
+        public void SetOutput(Vector2Int position, short value)
         {
-            outputData[position.x, position.y, position.z] = value;
-            OnOutputChange?.Invoke(position * PlyModelPrefab.modelSize, value);
+            outputData[position.x, position.y] = value;
+            OnOutputChange?.Invoke(position, value);
         }
-        public byte GetInput(Vector3Int position)
+        public byte GetInput(Vector2Int position)
         {
-            return inputData[position.x, position.y, position.z];
+            return inputData[position.x, position.y];
         }
-        public byte[,,] GetInputData()
+        public byte[,] GetInputData()
         {
             return inputData;
         }
