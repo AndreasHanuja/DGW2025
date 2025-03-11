@@ -110,10 +110,10 @@ namespace Game.Map.Voxel
                              ((chunkValue >> 8) & 255) / 255f,
                              (chunkValue & 255) / 255f
                         );
-                        //Color.RGBToHSV(voxelColor, out float h, out float s, out float v);
-                        //System.Random random = new System.Random(position.GetHashCode());
-                        //v = Mathf.Clamp01(random.Next((int)((v - randomColorRange) * 100), (int)((v + randomColorRange) * 100)) / 100f);
-                        //voxelColor = Color.HSVToRGB(h, s, v);
+                        Color.RGBToHSV(voxelColor, out float h, out float s, out float v);
+                        System.Random random = new System.Random(position.GetHashCode());
+                        v = Mathf.Clamp01(random.Next((int)((v - randomColorRange) * 100), (int)((v + randomColorRange) * 100)) / 100f);
+                        voxelColor = Color.HSVToRGB(h, s, v);
 
                         for(int i = 0; i<addedVertices; i++)
                         {

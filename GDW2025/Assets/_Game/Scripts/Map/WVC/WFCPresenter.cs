@@ -10,7 +10,9 @@ namespace Game.Map.WFC
 {
     public class WFCPresenter : MonoBehaviour
     {
-        public event Action<PlyModel> OnModelUpdated; 
+        public event Action<PlyModel> OnModelUpdated;
+
+        [SerializeField] private int seed;
 
         public static WFCPresenter Instance;
         private WFCModel model;
@@ -138,7 +140,7 @@ namespace Game.Map.WFC
         private void CellCollapse(Vector2Int position, HashSet<short> possibilities, HashSet<Vector2Int> openPositions)
         {
             List<PlyModelPrefab> prefabs = model.GetPrefabs();
-            System.Random random = new System.Random(position.GetHashCode());
+            System.Random random = new System.Random(position.GetHashCode() + seed);
             IEnumerable<(short, float)> weightsPos = possibilities.Select(p => (p, prefabs[p].weight * random.Next(0, 10000)));
             
             short bestPos = -1;

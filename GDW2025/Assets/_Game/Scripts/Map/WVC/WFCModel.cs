@@ -10,7 +10,7 @@ namespace Game.Map.WFC
     {
         public event Action<Vector2Int, short> OnOutputChange;
 
-        public const int worldSize = 16;
+        public const int worldSize = 8;
         private List<PlyModelPrefab> prefabs;
         private byte[,] inputData = new byte[worldSize, worldSize];
         private short[,] outputData = new short[worldSize, worldSize];
