@@ -9,59 +9,52 @@ namespace Game.Map.Models
     public class PlyModelPrefab
     {
         public const int modelSize = 16;
-        public int[,,] data = new int[modelSize, modelSize, modelSize];
-        /*
-         * Reihenfolge der Seiten
-         * 0: vorne
-         * 1: hinten
-         * 2: unten
-         * 3: oben
-         * 4: links
-         * 5: rechts
-         */
-        public string[] seitenHashs = new string[6];
 
-        public List<int> allowedInputs = new List<int>();
-        public int collapsePriority;
+        [SerializeField, HideInInspector] public int height;
+
+        public int[] data;
+        [HideInInspector] public List<int> allowedInputs = new List<int>();
+        [HideInInspector] public int collapsePriority;
+        [HideInInspector] public int id;
+
+        public string[] hashes = new string[4]; // north, east, south, west
+
+        public void InitHeight(int height)
+        {
+            this.height = height;
+            data = new int[modelSize * modelSize * height];
+        }
+        public int GetData(int x, int y, int z)
+        {
+            return data[x + z * modelSize + y * modelSize * modelSize];
+        }
+        public void SetData(int x, int y, int z, int value)
+        {
+            data[x + z * modelSize + y * modelSize * modelSize] = value;
+        }
 
         public PlyModel Instantiate(Vector3Int offset)
         {
             return new PlyModel(offset, this);
         }
-
-        public bool CheckConnectivity(PlyModelPrefab other, Vector3Int direction)
+        public bool CheckConnectivity(PlyModelPrefab other, Vector2Int direction)
         {
-            // von vorne
-            if(direction == new Vector3Int(0, 0, 1))
+            if(direction == Vector2Int.up)
             {
-                return seitenHashs[0] == other.seitenHashs[1];
+                return hashes[0] == other.hashes[2];
             }
-            // von hinten
-            if (direction == new Vector3Int(0, 0, -1))
+            if (direction == Vector2Int.right)
             {
-                return seitenHashs[1] == other.seitenHashs[0];
+                return hashes[1] == other.hashes[3];
             }
-            // von unten
-            if (direction == new Vector3Int(0, 1, 0))
+            if (direction == Vector2Int.down)
             {
-                return seitenHashs[2] == other.seitenHashs[3];
+                return hashes[2] == other.hashes[0];
             }
-            // von oben
-            if (direction == new Vector3Int(0, -1, 0))
+            if (direction == Vector2Int.left)
             {
-                return seitenHashs[3] == other.seitenHashs[2];
+                return hashes[3] == other.hashes[1];
             }
-            // von links
-            if (direction == new Vector3Int(1, 0, 0))
-            {
-                return seitenHashs[4] == other.seitenHashs[5];
-            }
-            // von rechts
-            if (direction == new Vector3Int(-1, 0, 0))
-            {
-                return seitenHashs[5] == other.seitenHashs[4];
-            }
-
             return false;
         }
     }

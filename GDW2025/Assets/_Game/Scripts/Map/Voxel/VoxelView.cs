@@ -1,5 +1,8 @@
+using Game.Map.WFC;
+using NUnit.Framework.Internal;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Searcher.SearcherWindow.Alignment;
 
 namespace Game.Map.Voxel
 {
@@ -10,40 +13,45 @@ namespace Game.Map.Voxel
 
         private Dictionary<Vector3Int, MeshFilter> chunks = new();
 
-        public void UpdateChunk(VoxelModel model, Vector3Int chunkKey)
-        {
-            if (!chunks.ContainsKey(chunkKey))
-            {
-                chunks[chunkKey] = Instantiate(chunkPrefab, transform).GetComponent<MeshFilter>();
-            }
-
-            MeshFilter meshFilter = chunks[chunkKey];
-            BuildChunk(meshFilter, model, chunkKey);
-        }
-      
-        private void BuildChunk(MeshFilter meshFilter, VoxelModel model, Vector3Int chunkKey)
+        public void UpdateChunk(int[] chunkData, Vector3Int chunkKey)
         {
             List<Vector3> vertices = new();
             List<int> triangles = new();
             List<Color> colors = new();
+            BuildChunk(vertices, triangles, colors, chunkData);
 
-            for(int x = chunkKey.x; x < chunkKey.x + VoxelModel.chunkSize; x++)
-            {
-                for (int y = chunkKey.y; y < chunkKey.y + VoxelModel.chunkSize; y++)
+            MainThreadDispatcher.Enqueue(() => {
+                if (!chunks.ContainsKey(chunkKey))
                 {
-                    for (int z = chunkKey.z; z < chunkKey.z + VoxelModel.chunkSize; z++)
-                    {
-                        Vector3Int position = new Vector3Int(x, y, z);
-                        uint chunkValue = (uint) model.GetValue(position);
+                    chunks[chunkKey] = Instantiate(chunkPrefab, transform).GetComponent<MeshFilter>();
+                    chunks[chunkKey].transform.position = chunkKey;
+                }
+                MeshFilter meshFilter = chunks[chunkKey];
+                meshFilter.mesh.SetVertices(vertices);
+                meshFilter.mesh.SetTriangles(triangles, 0);
+                meshFilter.mesh.SetColors(colors);
+                meshFilter.mesh.RecalculateNormals();
+            });
+        }
 
-                        if(chunkValue == 0)
+        private void BuildChunk(List<Vector3> vertices, List<int> triangles, List<Color> colors, int[] chunkData)
+        {
+            for(int x = 0; x < VoxelModel.chunkSize; x++)
+            {
+                for (int y = 0; y < VoxelModel.chunkSize; y++)
+                {
+                    for (int z = 0; z < VoxelModel.chunkSize; z++)
+                    {
+                        Vector3Int position = new Vector3Int(x, y, z);                       
+
+                        if(IsEmpty(chunkData, position))
                         {
                             continue;
                         }
 
                         int vertexCount = vertices.Count;
 
-                        if(model.GetValue(position + Vector3Int.back) == 0)
+                        if(IsEmpty(chunkData, position + Vector3Int.back))
                         {
                             vertices.Add(position);
                             vertices.Add(position + Vector3.up);
@@ -51,7 +59,7 @@ namespace Game.Map.Voxel
                             vertices.Add(position + Vector3.right);
                         }
 
-                        if (model.GetValue(position + Vector3Int.up) == 0)
+                        if (IsEmpty(chunkData, position + Vector3Int.up))
                         {
                             vertices.Add(position + Vector3.up);
                             vertices.Add(position + Vector3.up + Vector3.forward);
@@ -59,7 +67,7 @@ namespace Game.Map.Voxel
                             vertices.Add(position + Vector3.up + Vector3.right);
                         }
 
-                        if (model.GetValue(position + Vector3Int.forward) == 0)
+                        if (IsEmpty(chunkData, position + Vector3Int.forward))
                         {
                             vertices.Add(position + Vector3.forward + Vector3.right);
                             vertices.Add(position + Vector3.forward + Vector3.right + Vector3.up);
@@ -67,7 +75,7 @@ namespace Game.Map.Voxel
                             vertices.Add(position + Vector3.forward);
                         }
 
-                        if (model.GetValue(position + Vector3Int.down) == 0)
+                        if (IsEmpty(chunkData, position + Vector3Int.down))
                         {
                             vertices.Add(position + Vector3.forward);
                             vertices.Add(position);
@@ -75,7 +83,7 @@ namespace Game.Map.Voxel
                             vertices.Add(position + Vector3.forward + Vector3.right);
                         }
 
-                        if (model.GetValue(position + Vector3Int.left) == 0)
+                        if (IsEmpty(chunkData, position + Vector3Int.left))
                         {
                             vertices.Add(position + Vector3.forward);
                             vertices.Add(position + Vector3.forward + Vector3.up);
@@ -83,7 +91,7 @@ namespace Game.Map.Voxel
                             vertices.Add(position);
                         }
 
-                        if (model.GetValue(position + Vector3Int.right) == 0)
+                        if (IsEmpty(chunkData, position + Vector3Int.right))
                         {
                             vertices.Add(position + Vector3.right);
                             vertices.Add(position + Vector3.right + Vector3.up);
@@ -92,6 +100,10 @@ namespace Game.Map.Voxel
                         }
 
                         int addedVertices = vertices.Count - vertexCount;
+
+                        uint chunkValue = (uint)chunkData[position.x +
+                           position.z * VoxelModel.chunkSize +
+                           position.y * VoxelModel.chunkSize * VoxelModel.chunkSize];
                         Color voxelColor = new Color(
                              (chunkValue >> 24) / 255f,
                              ((chunkValue >> 16) & 255) / 255f,
@@ -120,11 +132,19 @@ namespace Game.Map.Voxel
                 triangles.Add(i + 2);
                 triangles.Add(i + 3);
             }
+        }
 
-            meshFilter.mesh.SetVertices(vertices);
-            meshFilter.mesh.SetTriangles(triangles, 0);
-            meshFilter.mesh.SetColors(colors);
-            meshFilter.mesh.RecalculateNormals();
+        private bool IsEmpty(int[] values, Vector3Int p)
+        {
+            return p.x >= 0 && 
+                p.x < VoxelModel.chunkSize && 
+                p.y >= 0 &&
+                p.y < VoxelModel.chunkSize && 
+                p.z >= 0 &&
+                p.z < VoxelModel.chunkSize &&
+                values[p.x + 
+                    p.z * VoxelModel.chunkSize + 
+                    p.y * VoxelModel.chunkSize * VoxelModel.chunkSize] == 0;
         }
     }
 }

@@ -3,8 +3,10 @@ namespace Game.Map.Models
 {
     public class PlyModel
     {
-        public PlyModelPrefab prefab;
-        public Vector3Int offset;
+        public readonly Vector3Int offset;
+        public int[] data { get => prefab.data; }
+
+        private PlyModelPrefab prefab;
 
         public PlyModel(Vector3Int offset, PlyModelPrefab prefab)
         {

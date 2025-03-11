@@ -1,6 +1,7 @@
 using DG.Tweening;
 using Game.Map.Models;
 using Game.Map.WFC;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -41,19 +42,20 @@ namespace Game.Map.Voxel
         {
             model.SetValue(position, value);
         }
-        public void SetStructure(Vector3Int position, int[,,] values)
+        public void SetStructure(Vector3Int position, int[] values)
         {
-            for(int x = 0; x < values.GetLength(0); x++)
+            Vector3Int chunkKeyTmp = position;
+            int currentIndex = 0;
+            while(currentIndex < values.Length)
             {
-                for (int y = 0; y < values.GetLength(1); y++)
-                {
-                    for (int z = 0; z < values.GetLength(2); z++)
-                    {
-                        model.SetValue(position + new Vector3Int(x, y, z), values[x, y, z], silent: true);                       
-                    }
-                }
-            }
-            model.UpdateDirtyChunks();            
+                model.ClearChunk(chunkKeyTmp);
+                int[] chunkData = model.GetChunkData(chunkKeyTmp);
+                int elementsToCopy = Mathf.Min(values.Length - currentIndex, chunkData.Length);
+                Array.Copy(values, currentIndex, chunkData, 0, elementsToCopy);
+                currentIndex += elementsToCopy;
+                chunkKeyTmp.y += VoxelModel.chunkSize;
+                model.UpdateChunk(position);
+            }          
         }
         public void AnimateStructure(Vector3Int position, int[,,] values, float duration)
         {
@@ -94,11 +96,11 @@ namespace Game.Map.Voxel
 
         private void UpdateChunkHandler(Vector3Int chunkKey)
         {
-            view.UpdateChunk(model, chunkKey);
+            view.UpdateChunk(model.GetChunkData(chunkKey), chunkKey);
         }
         private void ModelUpdatedHandler(PlyModel plyModel)
         {
-            SetStructure(plyModel.offset, plyModel.prefab.data);
+            SetStructure(plyModel.offset, plyModel.data);
         }
     }
 }

@@ -1,8 +1,9 @@
 using Game.Map.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using Unity.IO.LowLevel.Unsafe;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Game.Map.WFC
@@ -12,12 +13,10 @@ namespace Game.Map.WFC
         public event Action<PlyModel> OnModelUpdated; 
 
         public static WFCPresenter Instance;
-        private WFCView view;
         private WFCModel model;
 
         private void Awake()
         {
-            view = GetComponent<WFCView>();
             model = GetComponent<WFCModel>();
 
             Instance = this;
@@ -32,18 +31,19 @@ namespace Game.Map.WFC
             model.OnOutputChange -= OutputUpdateHandler;
         }
 
-        private void OutputUpdateHandler(Vector3Int position, byte output)
+        private void OutputUpdateHandler(Vector2Int position, short output)
         {
-            OnModelUpdated?.Invoke(model.GetPrefabs()[output].Instantiate(position));
+            position *= PlyModelPrefab.modelSize;
+            OnModelUpdated?.Invoke(model.GetPrefabs()[output - 1].Instantiate(new Vector3Int(position.x, 0, position.y)));
         }
 
-        public void SetInput(Vector3Int position, byte value)
+        public void SetInput(Vector2Int position, byte value)
         {
             model.SetInput(position, value);
             RecalculateOutput(model.GetInputData(), model.GetPrefabs());
         }
 
-        public byte GetInput(Vector3Int position)
+        public byte GetInput(Vector2Int position)
         {
             return model.GetInput(position);
         }
@@ -55,27 +55,29 @@ namespace Game.Map.WFC
             RecalculateOutput(model.GetInputData(), model.GetPrefabs());
         }
 
-        private void RecalculateOutput(byte[,,] inputData, List<PlyModelPrefab> prefabs)
+        private void RecalculateOutput(byte[,] inputData, List<PlyModelPrefab> prefabs)
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             int size = WFCModel.worldSize;
-            HashSet<byte>[,,] possibilities = new HashSet<byte>[size, size, size];
+            HashSet<short>[,] possibilities = new HashSet<short>[size, size];
 
             Init(possibilities, inputData, prefabs);
 
-            HashSet<Vector3Int> openPositions = new();
+            HashSet<Vector2Int> openPositions = new();
             InitPositions(openPositions, possibilities);
-            HashSet<Vector3Int> uncollapsedPositions = openPositions.ToHashSet();
+            HashSet<Vector2Int> uncollapsedPositions = openPositions.ToHashSet();
 
             while (uncollapsedPositions.Any())
             {
-                Vector3Int currentValue;
-                HashSet<byte> currentPossibilities;
+                Vector2Int currentValue;
+                HashSet<short> currentPossibilities;
                 while (openPositions.Any())
                 {
                     currentValue = openPositions.ElementAt(0);
                     openPositions.Remove(currentValue);
 
-                    currentPossibilities = possibilities[currentValue.x, currentValue.y, currentValue.z];
+                    currentPossibilities = possibilities[currentValue.x, currentValue.y];
                     foreach(byte possibility in currentPossibilities.ToList())
                     {
                         if (CheckPossibility(possibilities, possibility, currentValue))
@@ -83,7 +85,7 @@ namespace Game.Map.WFC
                             continue;
                         }
                         currentPossibilities.Remove(possibility);
-                        foreach(Vector3Int neighbor in GetNeighbours(currentValue))
+                        foreach(Vector2Int neighbor in GetNeighbours(currentValue))
                         {
                             openPositions.Add(neighbor);
                         }
@@ -91,76 +93,74 @@ namespace Game.Map.WFC
                 }
                 currentValue = uncollapsedPositions.ElementAt(0);
                 uncollapsedPositions.Remove(currentValue);
-                CellCollapse(currentValue, possibilities[currentValue.x, currentValue.y, currentValue.z], openPositions);
+                CellCollapse(currentValue, possibilities[currentValue.x, currentValue.y], openPositions);
             }
 
+            stopwatch.Stop();
+            UnityEngine.Debug.Log("WFC took " + stopwatch.ElapsedMilliseconds+" ms");
+            stopwatch.Restart();
             Output(possibilities);
-        } //TODO CALLEN
+            UnityEngine.Debug.Log("Generating mesh took " + stopwatch.ElapsedMilliseconds + " ms");
+        }
 
-        private void Init(HashSet<byte>[,,] possibilities, byte[,,] inputData, List<PlyModelPrefab> prefabs)
+        private void Init(HashSet<short>[,] possibilities, byte[,] inputData, List<PlyModelPrefab> prefabs)
         {
             int size = WFCModel.worldSize;
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
                 {
-                    for (int z = 0; z < size; z++)
+                    possibilities[x, y] = new HashSet<short>();
+                    for (byte i = 0; i < prefabs.Count; i++)
                     {
-                        possibilities[x, y, z] = new HashSet<byte>();
-                        for (byte i = 0; i < prefabs.Count; i++)
+                        if (prefabs[i].allowedInputs.Contains(inputData[x, y]))
                         {
-                            if (prefabs[i].allowedInputs.Contains(inputData[x, y, z]))
-                            {
-                                possibilities[x, y, z].Add(i);
-                            }
+                            possibilities[x, y].Add(i);
                         }
                     }
                 }
             }
         }
-        private void InitPositions(HashSet<Vector3Int> openPositions, HashSet<byte>[,,] possibilities)
+        private void InitPositions(HashSet<Vector2Int> openPositions, HashSet<short>[,] possibilities)
         {
             int size = WFCModel.worldSize;
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
                 {
-                    for (int z = 0; z < size; z++)
+                    if (possibilities[x, y].Count > 1)
                     {
-                        if (possibilities[x, y, z].Count > 1)
-                        {
-                            openPositions.Add(new Vector3Int(x, y, z));
-                        }    
+                        openPositions.Add(new Vector2Int(x, y));
                     }
                 }
             }
         }
-        private void CellCollapse(Vector3Int position, HashSet<byte> possibilities, HashSet<Vector3Int> openPositions)
+        private void CellCollapse(Vector2Int position, HashSet<short> possibilities, HashSet<Vector2Int> openPositions)
         {
             List<PlyModelPrefab> prefabs = model.GetPrefabs();
             int priorityClass = prefabs[possibilities.First()].collapsePriority;
 
             possibilities.RemoveWhere(p => prefabs[p].collapsePriority != priorityClass);
             System.Random random = new System.Random(position.GetHashCode());
-            byte selectedPossibility = (byte)random.Next(possibilities.Count);
+            short selectedPossibility = possibilities.ElementAt(random.Next(possibilities.Count));
 
             possibilities.Clear();
             possibilities.Add(selectedPossibility);
 
-            foreach(Vector3Int neighbor in GetNeighbours(position))
+            foreach(Vector2Int neighbor in GetNeighbours(position))
             {
                 openPositions.Add(neighbor);
             }
         }
-        private bool CheckPossibility(HashSet<byte>[,,] possibilities, byte possibility, Vector3Int position)
+        private bool CheckPossibility(HashSet<short>[,] possibilities, short possibility, Vector2Int position)
         {
             List<PlyModelPrefab> prefabs = model.GetPrefabs();
             PlyModelPrefab myPrefab = prefabs[possibility];
 
-            foreach (Vector3Int neighbor in GetNeighbours(position))
+            foreach (Vector2Int neighbor in GetNeighbours(position))
             {
                 bool matchAny = false;
-                foreach(byte possibilityNeighbor in possibilities[neighbor.x, neighbor.y, neighbor.z])
+                foreach(byte possibilityNeighbor in possibilities[neighbor.x, neighbor.y])
                 {
                     if (myPrefab.CheckConnectivity(model.GetPrefabs()[possibilityNeighbor], neighbor - position))
                     {
@@ -175,45 +175,43 @@ namespace Game.Map.WFC
             }
             return true;
         }
-        private HashSet<Vector3Int> GetNeighbours(Vector3Int position)
+        private HashSet<Vector2Int> GetNeighbours(Vector2Int position)
         {
-            HashSet<Vector3Int> output = new();
-            output.Add(NeighbourHelper(position + Vector3Int.forward));
-            output.Add(NeighbourHelper(position + Vector3Int.back));
-            output.Add(NeighbourHelper(position + Vector3Int.left));
-            output.Add(NeighbourHelper(position + Vector3Int.right));
-            output.Add(NeighbourHelper(position + Vector3Int.up));
-            output.Add(NeighbourHelper(position + Vector3Int.down));
+            HashSet<Vector2Int> output = new();
+            output.Add(NeighbourHelper(position + Vector2Int.up));
+            output.Add(NeighbourHelper(position + Vector2Int.right));
+            output.Add(NeighbourHelper(position + Vector2Int.down));
+            output.Add(NeighbourHelper(position + Vector2Int.left));
             output.Remove(position);
 
             return output;
         }
-        private Vector3Int NeighbourHelper(Vector3Int position)
+        private Vector2Int NeighbourHelper(Vector2Int position)
         {
-            return new Vector3Int(
+            return new Vector2Int(
                 Mathf.Clamp(position.x, 0, WFCModel.worldSize - 1),
-                Mathf.Clamp(position.y, 0, WFCModel.worldSize - 1),
-                Mathf.Clamp(position.z, 0, WFCModel.worldSize - 1)
+                Mathf.Clamp(position.y, 0, WFCModel.worldSize - 1)
             );
         }
-        private void Output(HashSet<byte>[,,] possibilities)
+        private void Output(HashSet<short>[,] possibilities)
         {
+            List<(Vector2Int, byte)> changes = new ();
             int size = WFCModel.worldSize;
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
                 {
-                    for (int z = 0; z < size; z++)
+                    byte output = (byte)(possibilities[x, y].First() + 1);
+                    Vector2Int position = new Vector2Int(x, y);
+
+                    if (model.GetOutput(position) != output)
                     {
-                        byte output = possibilities[x, y, z].First();
-                        Vector3Int position = new Vector3Int(x, y, z);
-                        if (model.GetOutput(position) != output)
-                        {
-                            model.SetOutput(position, output);
-                        }
+                        changes.Add((position, output));
                     }
                 }
             }
+
+            Parallel.ForEach(changes, t => model.SetOutput(t.Item1, t.Item2));
         }
     }
 }
