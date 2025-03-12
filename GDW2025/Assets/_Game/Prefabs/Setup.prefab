@@ -160,6 +160,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d11d1b2196dde6448e150e41e6d4f70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  raycast: {fileID: 0}
+  modelListe: {fileID: 7783676267184403408}
 --- !u!1 &2473375581346453898
 GameObject:
   m_ObjectHideFlags: 0
@@ -219,6 +221,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d8c14a4ce180c724f9d6333d80e08ce5, type: 2}
   - {fileID: 11400000, guid: f242e906b7d875b458265e86dfe12894, type: 2}
   - {fileID: 11400000, guid: 4e4b3a31550d7bc498cfbd7fcbedae9d, type: 2}
+  prefabs: []
 --- !u!1 &5187736419559728262
 GameObject:
   m_ObjectHideFlags: 0

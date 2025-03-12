@@ -16,13 +16,13 @@ public class GameManagerTransitionListener : MonoBehaviour
 	[SerializeField]
 	public UnityEvent OnTransitioned;
 
-	public void OnEnable()
+	public void Start()
 	{
 		GameManager.Instance.OnTransitioned += OnGameManagerTransition;
 	}
 
 
-	private void OnDisable()
+	private void OnDestroy()
 	{
 		GameManager.Instance.OnTransitioned -= OnGameManagerTransition;
 	}
