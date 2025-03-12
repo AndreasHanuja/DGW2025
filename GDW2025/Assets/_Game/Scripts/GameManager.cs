@@ -12,8 +12,7 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 		DrawingBuilding,
 		SelectingBuildingPlacement,
 		PlacingBuilding,
-		GameOver,
-		Paused
+		GameOver
 	}
 
 	public enum Trigger
@@ -24,12 +23,12 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 		DrawBuildingCompleted,
 		PlaceBuilding,
 		PlacingBuildingCompleted,
-		RestartLevel,
+		RestartLevel
 	}
 
 	private StateMachine<State, Trigger> stateMachiene;
 	private bool CanDrawBuilding => true;
-	public event Action<StateMachine<State, Trigger>.Transition> OnTransition;
+	public event Action<StateMachine<State, Trigger>.Transition> OnTransitioned;
 
 	protected override void Awake()
 	{
@@ -60,9 +59,14 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 		stateMachiene.Configure(State.GameOver)
 			.Permit(Trigger.RestartLevel, State.Starting);
 
-		stateMachiene.OnTransitioned((transition) => OnTransition?.Invoke(transition));
+		stateMachiene.OnTransitioned((transition) => OnTransitioned?.Invoke(transition));
 
 		string graph = UmlDotGraph.Format(stateMachiene.GetInfo());
 		Debug.Log(graph);
+	}
+
+	public void FireTrigger(Trigger trigger)
+	{
+		stateMachiene.Fire(trigger);
 	}
 }
