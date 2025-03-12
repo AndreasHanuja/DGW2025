@@ -12,16 +12,20 @@ public class ModelListe : MonoBehaviour
 {
 
     [SerializeField] private List<PlyModelSetup> models = new();
-    private List<PlyModelPrefab> prefabs = new();
+    [HideInInspector] public List<PlyModelPrefab> prefabs = new();
 
     private IEnumerator Start()
     {
         yield return new WaitForSeconds(1);
 
+
         foreach (PlyModelSetup setup in models)
         {
-            setup.LoadModel();
-            setup.SetHashs();
+            if(setup.createdPrefabs.Count != 8)
+            {
+                setup.LoadModel();
+                setup.SetHashs();
+            }
             for (int i = 0; i < 8; i++)
             {
                 prefabs.Add(setup.createdPrefabs[i]);
@@ -34,6 +38,11 @@ public class ModelListe : MonoBehaviour
         {
             prefabs[i].id = i;
         }
+
+        PlyModelPrefab emptyPrefab = new PlyModelPrefab();
+        emptyPrefab.allowedGround = new List<int> { 0, 1, 2, 3 };
+        emptyPrefab.allowedInputs = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+        prefabs.Add(emptyPrefab);
 
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();

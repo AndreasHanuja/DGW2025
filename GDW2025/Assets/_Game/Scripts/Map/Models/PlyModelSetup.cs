@@ -91,6 +91,10 @@ namespace Game.Map.Models
                     createdPrefabs[7].SetData(z, y, x, block.w);                                        //gespiegelt rotiert 270°
                 }                
             }
+
+            #if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(this);
+            #endif
         }
 
         public void SetHashs()
@@ -170,6 +174,10 @@ namespace Game.Map.Models
                 }
                 createdPrefabs[i].hashes[3] = ComputeSha256Hash(data);
             }
+
+            #if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(this);
+            #endif    
         }
 
         public static string ComputeSha256Hash(List<int> data)
