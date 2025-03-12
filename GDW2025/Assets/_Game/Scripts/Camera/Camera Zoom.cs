@@ -1,28 +1,28 @@
-using Unity.Cinemachine;
 using UnityEngine;
 
 public class CameraZoom : MonoBehaviour
 {
-    [SerializeField] private float zoomSpeed = 10f;
-    [SerializeField] private float minZoom = -1f;
-    [SerializeField] private float maxZoom = -20f;
+    [SerializeField] private float zoomSpeed = -100f;
+    [SerializeField] private float minZoom = 20f;
+    [SerializeField] private float maxZoom = 300f;
+    private float cameraZoom;
+    private Vector3 cameraOffsetDirection;
 
-    private CinemachineFollow cameraZoom;
-
-    void Start()
+    public void Start()
     {
-        cameraZoom = GetComponent<CinemachineFollow>();
+        cameraZoom = transform.localPosition.magnitude;
+        cameraOffsetDirection = transform.localPosition.normalized;
     }
 
     void Update()
     {
         float scrollInput = Input.GetAxis("Mouse ScrollWheel");
 
-        // Wenn das Mausrad bewegt wird, ändern wir den Field of View (FOV)
         if (scrollInput != 0)
         {
-            cameraZoom.FollowOffset.z -= scrollInput * zoomSpeed;
-            cameraZoom.FollowOffset.z = Mathf.Clamp(cameraZoom.FollowOffset.z, maxZoom, minZoom);
+            cameraZoom *= Mathf.Clamp(1f + (scrollInput * zoomSpeed) , 0f , 2f);
+            cameraZoom = Mathf.Clamp(cameraZoom, minZoom, maxZoom);
+            transform.localPosition = cameraOffsetDirection * cameraZoom;
         }
     }
 }
