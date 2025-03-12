@@ -14,6 +14,7 @@ namespace Game.Map.Models
 
         [HideInInspector] public int[] data;
         [HideInInspector] public List<int> allowedInputs = new List<int>();
+        [HideInInspector] public List<int> allowedGround = new List<int>();
         [HideInInspector] public float weight;
         [HideInInspector] public int id;
 

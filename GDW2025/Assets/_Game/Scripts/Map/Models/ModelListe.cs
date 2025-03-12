@@ -1,8 +1,11 @@
 using Game.Map.Models;
+using Game.Map.Voxel;
 using Game.Map.WFC;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class ModelListe : MonoBehaviour
@@ -29,6 +32,15 @@ public class ModelListe : MonoBehaviour
         {
             prefabs[i].id = i;
         }
-        WFCPresenter.Instance.SetPlyModelPrefabs(prefabs);
+
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        IEnumerable<WFCOutputChange> output = WFCManager.Instance.WFC_Init(16, 0, prefabs);
+        UnityEngine.Debug.Log("WFC took " + stopwatch.ElapsedMilliseconds);
+
+        stopwatch.Restart();
+        Parallel.ForEach(output, o => VoxelPresenter.Instance.SetStructure(new Vector3Int(o.position.x * 16, 0, o.position.y * 16), prefabs[o.value].data));
+        UnityEngine.Debug.Log("Meshing took " + stopwatch.ElapsedMilliseconds);
+
     }
 }

@@ -12,6 +12,8 @@ namespace Game.Map.Models
     public class PlyModelSetup : ScriptableObject
     {
         [SerializeField] private List<int> allowedInputs;
+        [SerializeField] private List<int> allowedGround;
+
         [SerializeField] private float weight;
 
         public List<PlyModelPrefab> createdPrefabs = new List<PlyModelPrefab>();
@@ -24,6 +26,7 @@ namespace Game.Map.Models
             {
                 PlyModelPrefab prefab = new PlyModelPrefab();
                 prefab.allowedInputs = allowedInputs.ToList();
+                prefab.allowedGround = allowedGround.ToList();
                 prefab.weight = weight;
                 createdPrefabs.Add(prefab);                
             }

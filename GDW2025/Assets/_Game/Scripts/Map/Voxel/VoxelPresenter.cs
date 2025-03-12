@@ -24,7 +24,7 @@ namespace Game.Map.Voxel
         }
         private void Start()
         {
-            WFCPresenter.Instance.OnModelUpdated += ModelUpdatedHandler;
+            //WFCPresenter.Instance.OnModelUpdated += ModelUpdatedHandler;
         }
 
         private void OnEnable()
@@ -34,8 +34,7 @@ namespace Game.Map.Voxel
         private void OnDisable()
         {
             model.OnChunkUpdated -= UpdateChunkHandler;
-            WFCPresenter.Instance.OnModelUpdated -= ModelUpdatedHandler;
-
+            //WFCPresenter.Instance.OnModelUpdated -= ModelUpdatedHandler;
         }
 
         public void SetValue(Vector3Int position, int value)
