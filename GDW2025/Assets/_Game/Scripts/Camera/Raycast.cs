@@ -12,6 +12,7 @@ public class Raycast : MonoBehaviour
     private void Update()
     {
         marker.transform.position = new Vector3(GetGridPosition().x, 0f , GetGridPosition().y);
+        GridClick();
     }
 
     private Vector2Int GetGridPosition()
