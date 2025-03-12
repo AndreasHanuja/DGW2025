@@ -18,10 +18,14 @@ public class ModelListe : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
 
+
         foreach (PlyModelSetup setup in models)
         {
-            setup.LoadModel();
-            setup.SetHashs();
+            if(setup.createdPrefabs.Count != 8)
+            {
+                setup.LoadModel();
+                setup.SetHashs();
+            }
             for (int i = 0; i < 8; i++)
             {
                 prefabs.Add(setup.createdPrefabs[i]);

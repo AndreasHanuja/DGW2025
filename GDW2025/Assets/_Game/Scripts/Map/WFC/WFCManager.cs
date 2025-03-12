@@ -36,6 +36,7 @@ namespace Game.Map.WFC
             HashSet<Vector2Int> propagatePositions = new();
             InitInitialPositions(uncollapsedPositions, propagatePositions);
 
+            PropagateAll(propagatePositions, initialPossibilities);
             HashSet<short>[,] possibilities = DeepCopyInitialPossibilities();
             while (uncollapsedPositions.Any())
             {
@@ -45,9 +46,25 @@ namespace Game.Map.WFC
 
             return Output(possibilities);
         }
-        public IEnumerable<WFCOutputChange> WFC_Iterate(IEnumerable<WFCInputChange> input)
+        public IEnumerable<WFCOutputChange> WFC_Iterate(IEnumerable<WFCInputChange> inputs)
         {
-            return null;
+            List<Vector2Int> uncollapsedPositions = new();
+            HashSet<Vector2Int> propagatePositions = new();
+
+            foreach(WFCInputChange input in inputs)
+            {
+                inputCached[input.position.x, input.position.y] = input.value;
+                initialPossibilities[input.position.x, input.position.y] = GetBaseProbabilitySpace(input.position.x, input.position.y);
+            }
+            PropagateAll(propagatePositions, initialPossibilities);
+
+            HashSet<short>[,] possibilities = DeepCopyInitialPossibilities();
+            while (uncollapsedPositions.Any())
+            {
+                PropagateAll(propagatePositions, possibilities);
+                CollapseBest(uncollapsedPositions, possibilities, propagatePositions);
+            }
+            return Output(possibilities);
         }
 
         #region HELPER FUNCTIONS
@@ -73,9 +90,13 @@ namespace Game.Map.WFC
             {
                 for (int y = 0; y < mapSize; y++)
                 {
-                    initialPossibilities[x, y] = prefabs.Where(p => p.allowedGround.Contains(groundCached[x, y]) && p.allowedInputs.Contains(inputCached[x, y])).Select(p => (short)p.id).ToHashSet();
+                    initialPossibilities[x, y] = GetBaseProbabilitySpace(x, y);
                 }
             }
+        }
+        private HashSet<short> GetBaseProbabilitySpace(int x, int y)
+        {
+            return prefabs.Where(p => p.allowedGround.Contains(groundCached[x, y]) && p.allowedInputs.Contains(inputCached[x, y])).Select(p => (short)p.id).ToHashSet();
         }
         private void InitInitialPositions(List<Vector2Int> uncollapsedPositions, HashSet<Vector2Int> propagatePositions)
         {
@@ -137,13 +158,11 @@ namespace Game.Map.WFC
             Vector2Int currentValue;
             HashSet<short> currentPossibilities;
 
-            //liste von laufenden threads hier verwalten
-            while (propagatePositions.Any()) // || es gibt noch laufende threads
+            while (propagatePositions.Any()) 
             {
                 currentValue = propagatePositions.First();
                 propagatePositions.Remove(currentValue);
 
-                //hier thread starten der das folgende macht:
                 currentPossibilities = possibilities[currentValue.x, currentValue.y];
 
                 foreach (short possibility in currentPossibilities.ToList())
@@ -153,12 +172,17 @@ namespace Game.Map.WFC
                         continue;
                     }
                     currentPossibilities.Remove(possibility);
+                    if(currentPossibilities.Count == 0)
+                    {
+                        currentPossibilities = GetBaseProbabilitySpace(currentValue.x, currentValue.y);
+                        propagatePositions.Add(currentValue);
+                        return;
+                    }
                     foreach (Vector2Int neighbor in GetNeighbours(currentValue))
                     {
                         propagatePositions.Add(neighbor);
                     }
                 }
-                //bis hier
             }
         }
         private bool CheckPossibility(HashSet<short>[,] possibilities, short possibility, Vector2Int position)
