@@ -61,12 +61,16 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 
 		stateMachiene.OnTransitioned((transition) => OnTransitioned?.Invoke(transition));
 
-		string graph = UmlDotGraph.Format(stateMachiene.GetInfo());
-		Debug.Log(graph);
+		//Debug.Log(UmlDotGraph.Format(stateMachiene.GetInfo()));
 	}
 
 	public void FireTrigger(Trigger trigger)
 	{
 		stateMachiene.Fire(trigger);
+	}
+
+	public bool IsInState(State state)
+	{
+		return stateMachiene.IsInState(state);
 	}
 }

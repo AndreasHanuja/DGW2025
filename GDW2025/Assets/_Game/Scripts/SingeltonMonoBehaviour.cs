@@ -12,7 +12,7 @@ public class SingeltonMonoBehaviour<T> : MonoBehaviour where T : SingeltonMonoBe
 	{
 		if (instance != null)
 		{
-#if UNITY_EDITOR && VERBOSE
+#if UNITY_EDITOR
 			Debug.LogError($"Multiple Instances of {typeof(T).Name}", Instance);
 			Debug.LogError($"Multiple Instances of {typeof(T).Name}", this);
 #endif
