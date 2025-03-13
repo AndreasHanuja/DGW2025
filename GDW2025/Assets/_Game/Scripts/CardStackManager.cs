@@ -7,7 +7,7 @@ public class CardStackManager
     public Action OnStackChanged;
     private CardStackManager()
     {
-        for(int i = 0; i < 50; i++)
+        for(int i = 0; i < 250; i++)
         {
             cardStack.Enqueue((byte)(1 + (i % 8)));
         }
