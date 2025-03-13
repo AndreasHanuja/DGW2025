@@ -45,7 +45,8 @@ namespace Game.Map
 
             if (outputChange.Count() > 0)
             {
-                CardStackManager.Instance.TryPop(out byte value);
+                GameManager.Instance.PlacedBuilding(new List<WFCResolvedChange>());
+                //TODO RICHTIG AUFLÖSEN
             }
         }
     }
