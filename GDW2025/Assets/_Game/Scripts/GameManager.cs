@@ -1,7 +1,9 @@
 using Stateless;
 using Stateless.Graph;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using static Game.Map.MapInteractionManager;
 
 public class GameManager : SingeltonMonoBehaviour<GameManager>
 {
@@ -27,6 +29,7 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 	}
 
 	private StateMachine<State, Trigger> stateMachiene;
+	private StateMachine<State, Trigger>.TriggerWithParameters<List<WFCResolvedChange>> placeBuildingTrigger;
 	private bool CanDrawBuilding => true;
 	public event Action<StateMachine<State, Trigger>.Transition> OnTransitioned;
 
@@ -40,6 +43,10 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 	{
 		stateMachiene = new StateMachine<State, Trigger>(State.MainMenu);
 
+		//create triggers with parameters
+		placeBuildingTrigger = stateMachiene.SetTriggerParameters<List<WFCResolvedChange>>(Trigger.PlaceBuilding);
+
+		//confugure states
 		stateMachiene.Configure(State.MainMenu)
 			.Permit(Trigger.EnterLevel, State.Starting);
 
@@ -67,6 +74,11 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 	public void FireTrigger(Trigger trigger)
 	{
 		stateMachiene.Fire(trigger);
+	}
+
+	public void PlacedBuilding(List<WFCResolvedChange> changes)
+	{
+		stateMachiene.Fire(placeBuildingTrigger, changes);
 	}
 
 	public bool IsInState(State state)
