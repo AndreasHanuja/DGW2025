@@ -15,7 +15,7 @@ namespace Game.Map.WFC
         #endregion
 
         #region PROPERTIES
-        private int mapSize;
+        private static int mapSize;
         private int seed;
         private List<PlyModelPrefab> prefabs;
 
@@ -31,7 +31,7 @@ namespace Game.Map.WFC
         }
         public void WFC_Init(int mapSize, int seed, List<PlyModelPrefab> prefabs, byte[,] groundCache)
         {
-            this.mapSize = mapSize;
+            WFCManager.mapSize = mapSize;
             this.seed = seed;
             this.prefabs = prefabs;
             this.groundCached = groundCache;
@@ -40,12 +40,17 @@ namespace Game.Map.WFC
         }
         public IEnumerable<WFCOutputChange> WFC_Iterate(IEnumerable<WFCInputChange> inputs)
         {
-            if(inputs.Any(i => inputCached[i.position.x, i.position.y] != 0)){
+            if(inputs.Any(i => i.Type == ChangeType.Input && inputCached[i.position.x, i.position.y] != 0)){
                 return new List<WFCOutputChange>();
             }
-            foreach (WFCInputChange input in inputs)
+
+            foreach (WFCInputChange input in inputs.Where(i => i.Type == ChangeType.Input))
             {
                 inputCached[input.position.x, input.position.y] = input.value;
+            }
+            foreach (WFCInputChange input in inputs.Where(i => i.Type == ChangeType.Map))
+            {
+                groundCached[input.position.x, input.position.y] = input.value;
             }
 
             InitInitialPossibilities();
@@ -238,7 +243,7 @@ namespace Game.Map.WFC
             }
             return true;
         }
-        private IEnumerable<Vector2Int> GetNeighbours(Vector2Int position)
+        public static IEnumerable<Vector2Int> GetNeighbours(Vector2Int position, bool containSelf = false)
         {
             HashSet<Vector2Int> output = new();
             if (position.y < mapSize - 1)
@@ -256,6 +261,10 @@ namespace Game.Map.WFC
             if (position.x > 1)
             {
                 yield return position + Vector2Int.left;
+            }
+            if (containSelf)
+            {
+                yield return position;
             }
         }
         private List<WFCOutputChange> Output(HashSet<short>[,] possibilities)
