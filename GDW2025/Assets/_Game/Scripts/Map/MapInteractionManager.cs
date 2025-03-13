@@ -20,7 +20,7 @@ namespace Game.Map
         {
             List<WFCInputChange> inputs = new List<WFCInputChange>
             {
-                new WFCInputChange() { position = Vector2Int.RoundToInt(clickPosition), Type = ChangeType.Map, value = 1 }
+                new WFCInputChange() { position = Vector2Int.RoundToInt(clickPosition), Type = ChangeType.Input, value = 1 }
             };
             IEnumerable<WFCOutputChange> outputChange = WFCManager.Instance.WFC_Iterate(inputs);
             Parallel.ForEach(outputChange, o => VoxelPresenter.Instance.SetStructure(new Vector3Int(o.position.x * 16, 0, o.position.y * 16), modelListe.prefabs[o.value].data));

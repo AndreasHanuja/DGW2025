@@ -2,6 +2,7 @@ using Game.Map.Models;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Game.Map.WFC
 {
@@ -48,13 +49,42 @@ namespace Game.Map.WFC
         }
         public IEnumerable<WFCOutputChange> WFC_Iterate(IEnumerable<WFCInputChange> inputs)
         {
+            foreach (WFCInputChange input in inputs)
+            {
+                inputCached[input.position.x, input.position.y] = input.value;
+            }
+
+            InitInitialPossibilities();
+
             List<Vector2Int> uncollapsedPositions = new();
             HashSet<Vector2Int> propagatePositions = new();
+            InitInitialPositions(uncollapsedPositions, propagatePositions);
 
+            PropagateAll(propagatePositions, initialPossibilities);
+            HashSet<short>[,] possibilities = DeepCopyInitialPossibilities();
+            while (uncollapsedPositions.Any())
+            {
+                PropagateAll(propagatePositions, possibilities);
+                CollapseBest(uncollapsedPositions, possibilities, propagatePositions);
+            }
+
+            return Output(possibilities);
+
+            /*List<Vector2Int> uncollapsedPositions = new();
+            HashSet<Vector2Int> propagatePositions = new();
+
+            for(int x = 0; x<mapSize; x++)
+            {
+                for(int y = 0; y<mapSize; y++)
+                {
+                    uncollapsedPositions.Add(new Vector2Int(x, y));
+                }
+            }
             foreach(WFCInputChange input in inputs)
             {
                 inputCached[input.position.x, input.position.y] = input.value;
                 initialPossibilities[input.position.x, input.position.y] = GetBaseProbabilitySpace(input.position.x, input.position.y);
+                propagatePositions.Add(input.position);
             }
             PropagateAll(propagatePositions, initialPossibilities);
 
@@ -64,7 +94,7 @@ namespace Game.Map.WFC
                 PropagateAll(propagatePositions, possibilities);
                 CollapseBest(uncollapsedPositions, possibilities, propagatePositions);
             }
-            return Output(possibilities);
+            return Output(possibilities);*/
         }
 
         #region HELPER FUNCTIONS
@@ -106,7 +136,7 @@ namespace Game.Map.WFC
                 {
                     if (initialPossibilities[x, y].Count <= 1)
                     {
-                        continue;
+                        //continue;
                     }
                     Vector2Int pos = new Vector2Int(x, y);
                     uncollapsedPositions.Add(pos);

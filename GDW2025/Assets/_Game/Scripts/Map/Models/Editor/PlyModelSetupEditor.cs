@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Game.Map.Models
 {
-    [CustomEditor(typeof(PlyModelSetup))]
+    [CustomEditor(typeof(PlyModelSetup)), CanEditMultipleObjects]
     public class PlyModelSetupEditor : Editor
     {
         public override void OnInspectorGUI()

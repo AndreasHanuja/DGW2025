@@ -47,6 +47,7 @@ public class Raycast : MonoBehaviour
         {
 
             Vector2Int pos = GetGridPosition() - new Vector2Int((int)gridTileSize / 2, (int)gridTileSize / 2);
+            pos /= gridTileSize;
 
             if (0 <= Mathf.Floor(pos.x) && Mathf.Floor(pos.x) <= gridSize && 0 <= Mathf.Floor(pos.y) && Mathf.Floor(pos.y) <= gridSize)
             {

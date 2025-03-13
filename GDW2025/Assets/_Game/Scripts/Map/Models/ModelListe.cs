@@ -42,6 +42,13 @@ public class ModelListe : MonoBehaviour
         PlyModelPrefab emptyPrefab = new PlyModelPrefab();
         emptyPrefab.allowedGround = new List<int> { 0, 1, 2, 3 };
         emptyPrefab.allowedInputs = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+        emptyPrefab.hashes = new string[] { 
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"};
+        emptyPrefab.id = prefabs.Count;
+        emptyPrefab.data = new int[0];
         prefabs.Add(emptyPrefab);
 
         Stopwatch stopwatch = new Stopwatch();

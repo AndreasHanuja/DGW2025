@@ -31,7 +31,7 @@ namespace Game.Map.Models
                 createdPrefabs.Add(prefab);                
             }
 
-            string fullPath = Path.Combine(Application.dataPath, ".Models/"+name+".ply");
+            string fullPath = Path.Combine(Application.dataPath, ".Models/"+ name.Replace("-", "/") + ".ply");
             string[] fileData = { };
 
             if (File.Exists(fullPath))
@@ -63,10 +63,10 @@ namespace Game.Map.Models
                     }
                 }
 
-                int minX = unsortedValues.Min(v => v.x);
+                int minX = -7;//unsortedValues.Min(v => v.x);
                 int minY = unsortedValues.Min(v => v.y);
                 int maxY = unsortedValues.Max(v => v.y);
-                int minZ = unsortedValues.Min(v => v.z);
+                int minZ = -7;// unsortedValues.Min(v => v.z);
 
                 for(int i= 0; i < 8; i++)
                 {

@@ -12,10 +12,10 @@ namespace Game.Map.Models
 
         [SerializeField, HideInInspector] public int height;
 
-        [HideInInspector] public int[] data;
+         public int[] data;
         [HideInInspector] public List<int> allowedInputs = new List<int>();
         [HideInInspector] public List<int> allowedGround = new List<int>();
-        [HideInInspector] public float weight;
+        public float weight;
         [HideInInspector] public int id;
 
         public string[] hashes = new string[4]; // north, east, south, west
@@ -57,7 +57,7 @@ namespace Game.Map.Models
                 return hashes[3] == other.hashes[1];
             }
             return false;
-        }
+        }        
     }
 
 
