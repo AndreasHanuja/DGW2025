@@ -464,6 +464,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: UILevelOverlay
       objectReference: {fileID: 0}
+    - target: {fileID: 3446739397283772552, guid: 96acfae5dcf83d04e83a82fc1e162500, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3446739397283772553, guid: 96acfae5dcf83d04e83a82fc1e162500, type: 3}
       propertyPath: m_Pivot.x
       value: 0
