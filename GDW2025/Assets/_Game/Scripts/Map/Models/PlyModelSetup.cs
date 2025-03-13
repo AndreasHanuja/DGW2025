@@ -1,4 +1,3 @@
-using Game.Map.Voxel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,36 +36,23 @@ namespace Game.Map.Models
             }
 
             string fullPath = Path.Combine(Application.dataPath, ".Models/"+ name.Replace("-", "/") + ".ply");
-            string[] fileData = { };
+			//Debug.Log(fullPath);
+			string[] fileData = { };
 
             if (File.Exists(fullPath))
             {
-                Debug.Log("start loading " + fullPath);
                 fileData = File.ReadAllLines(fullPath);
                 bool headerFinish = false;                
                 List<int4> unsortedValues = new List<int4>();
                 foreach (string line in fileData)
                 {
                     if (headerFinish == true)
-                    {                        
+                    {
                         string[] values = line.Split(' ');
-                        if (values.Length != 6)
-                        {
-                            continue;
-                        }
 
-                        if (!int.TryParse(values[0], out int xCord)){
-                            xCord = Mathf.RoundToInt(float.Parse(values[0]) * 10);
-                        }
-                        if (!int.TryParse(values[2], out int yCord))
-                        {
-                            yCord = Mathf.RoundToInt(float.Parse(values[2]) * 10);
-                        }
-                        if (!int.TryParse(values[1], out int zCord))
-                        {
-                            zCord = Mathf.RoundToInt(float.Parse(values[1]) * 10);
-                        }
-
+                        int xCord = int.Parse(values[0]);
+                        int yCord = int.Parse(values[2]);
+                        int zCord = int.Parse(values[1]);
                         int r = int.Parse(values[3]);
                         int g = int.Parse(values[4]);
                         int b = int.Parse(values[5]);
@@ -81,14 +67,14 @@ namespace Game.Map.Models
                         headerFinish = true;
                     }
                 }
-                int minX = -8;
+                int minX = Mathf.RoundToInt(unsortedValues.Min(v => v.x) / 8.0f) * 8;
                 int minY = unsortedValues.Min(v => v.y);
                 int maxY = unsortedValues.Max(v => v.y);
-                int minZ = -8;
+                int minZ = Mathf.RoundToInt(unsortedValues.Min(v => v.z) / 8.0f) * 8;
 
                 for(int i= 0; i < createdPrefabs.Count; i++)
                 {
-                    createdPrefabs[i].InitHeight(maxY - minY + 2);
+                    createdPrefabs[i].InitHeight(maxY - minY + 5);
                 }
 
                 foreach (int4 block in unsortedValues)
@@ -99,15 +85,15 @@ namespace Game.Map.Models
 
                     int maxSize = PlyModelPrefab.modelSize - 1;
                     createdPrefabs[0].SetData(x, y, z, block.w);                                        //normal
-                    createdPrefabs[1].SetData(z, y, maxSize - x, block.w);                              //normal rotiert 90°
-                    createdPrefabs[2].SetData(maxSize - x, y, maxSize - z, block.w);                    //normal rotiert 180°
-                    createdPrefabs[3].SetData(maxSize - z, y, x, block.w);                              //normal rotiert 270°
+                    createdPrefabs[1].SetData(z, y, maxSize - x, block.w);                              //normal rotiert 90ï¿½
+                    createdPrefabs[2].SetData(maxSize - x, y, maxSize - z, block.w);                    //normal rotiert 180ï¿½
+                    createdPrefabs[3].SetData(maxSize - z, y, x, block.w);                              //normal rotiert 270ï¿½
 
                     /*
                     createdPrefabs[4].SetData(maxSize - x, y, z, block.w);                              //gespiegelt
-                    createdPrefabs[5].SetData(maxSize - z, y, maxSize - x, block.w);                    //gespiegelt rotiert 90°
-                    createdPrefabs[6].SetData(x, y, maxSize - z, block.w);                              //gespiegelt rotiert 180°
-                    createdPrefabs[7].SetData(z, y, x, block.w);                                        //gespiegelt rotiert 270°
+                    createdPrefabs[5].SetData(maxSize - z, y, maxSize - x, block.w);                    //gespiegelt rotiert 90ï¿½
+                    createdPrefabs[6].SetData(x, y, maxSize - z, block.w);                              //gespiegelt rotiert 180ï¿½
+                    createdPrefabs[7].SetData(z, y, x, block.w);                                        //gespiegelt rotiert 270ï¿½
                     */
                 }                
             }
