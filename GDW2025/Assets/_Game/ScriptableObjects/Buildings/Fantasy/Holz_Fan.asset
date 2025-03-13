@@ -23,7 +23,7 @@ MonoBehaviour:
     allowedInputs: 01000000
     allowedGround: 02000000
     weight: 100
-    id: 12
+    id: 0
     hashes:
     - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -35,7 +35,7 @@ MonoBehaviour:
     allowedInputs: 01000000
     allowedGround: 02000000
     weight: 100
-    id: 13
+    id: 0
     hashes:
     - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -47,7 +47,7 @@ MonoBehaviour:
     allowedInputs: 01000000
     allowedGround: 02000000
     weight: 100
-    id: 14
+    id: 0
     hashes:
     - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -59,7 +59,7 @@ MonoBehaviour:
     allowedInputs: 01000000
     allowedGround: 02000000
     weight: 100
-    id: 15
+    id: 0
     hashes:
     - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
