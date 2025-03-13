@@ -1,3 +1,4 @@
+using Game.Map.Voxel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -40,18 +41,32 @@ namespace Game.Map.Models
 
             if (File.Exists(fullPath))
             {
+                Debug.Log("start loading " + fullPath);
                 fileData = File.ReadAllLines(fullPath);
                 bool headerFinish = false;                
                 List<int4> unsortedValues = new List<int4>();
                 foreach (string line in fileData)
                 {
                     if (headerFinish == true)
-                    {
+                    {                        
                         string[] values = line.Split(' ');
+                        if (values.Length != 6)
+                        {
+                            continue;
+                        }
 
-                        int xCord = int.Parse(values[0]);
-                        int yCord = int.Parse(values[2]);
-                        int zCord = int.Parse(values[1]);
+                        if (!int.TryParse(values[0], out int xCord)){
+                            xCord = Mathf.RoundToInt(float.Parse(values[0]) * 10);
+                        }
+                        if (!int.TryParse(values[2], out int yCord))
+                        {
+                            yCord = Mathf.RoundToInt(float.Parse(values[2]) * 10);
+                        }
+                        if (!int.TryParse(values[1], out int zCord))
+                        {
+                            zCord = Mathf.RoundToInt(float.Parse(values[1]) * 10);
+                        }
+
                         int r = int.Parse(values[3]);
                         int g = int.Parse(values[4]);
                         int b = int.Parse(values[5]);
@@ -73,7 +88,7 @@ namespace Game.Map.Models
 
                 for(int i= 0; i < createdPrefabs.Count; i++)
                 {
-                    createdPrefabs[i].InitHeight(maxY - minY + 1);
+                    createdPrefabs[i].InitHeight(maxY - minY + 2);
                 }
 
                 foreach (int4 block in unsortedValues)
