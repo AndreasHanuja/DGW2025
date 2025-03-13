@@ -46,6 +46,7 @@ public class PointsManager : SingeltonMonoBehaviour<PointsManager>
 
 		foreach (PlyModelSetup building in buildings)
 		{
+			if(building == null) continue;
 			Points += building.PointValue;
 		}
 

@@ -51,7 +51,7 @@ public class CardStackManager : SingeltonMonoBehaviour<CardStackManager>
 	{
 		if (CardStackSize <= 0)
 		{
-			throw new System.InvalidOperationException();
+			throw new System.InvalidOperationException("User hat ne Karte gezogen, soll er aber nicht wenns keine gibt!");
 		}
 
 		CardStackSize--;

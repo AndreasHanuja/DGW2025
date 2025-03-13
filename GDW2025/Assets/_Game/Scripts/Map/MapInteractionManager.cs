@@ -46,7 +46,14 @@ namespace Game.Map
             if (outputChange.Count() > 0)
             {
                 List<PlyModelPrefab> prefabs = WFCManager.Instance.GetPrefabs();
-                GameManager.Instance.PlacedBuilding(outputChange.Select(o => new WFCResolvedChange { position = o.position, newValue = prefabs[o.newValue].setup, oldValue = prefabs[o.oldValue].setup }).ToList());
+                GameManager.Instance.PlacedBuilding(
+                    outputChange.Select(o => {
+                        return new WFCResolvedChange { 
+                            position = o.position,  
+                            newValue = o.newValue == -1 ? null : prefabs[o.newValue].setup, 
+                            oldValue = o.oldValue == -1 ? null : prefabs[o.oldValue].setup
+                        };
+                    }).ToList());
             }
         }
     }
