@@ -9,11 +9,11 @@ public class CardStackManager
     {
         for(int i = 0; i < 50; i++)
         {
-            cardStack.Push((byte)(1 + (i % 8)));
+            cardStack.Enqueue((byte)(1 + (i % 8)));
         }
     }
 
-    private Stack<byte> cardStack = new();
+    private Queue<byte> cardStack = new();
 
     public bool TryPeek(out byte value)
     {
@@ -21,16 +21,21 @@ public class CardStackManager
     }
     public void Push(byte value) //@Gandi hier bitte Karten in den Stack adden <3
     {
-        cardStack.Push(value);
+        cardStack.Enqueue(value);
         OnStackChanged?.Invoke();
     }
     public bool TryPop(out byte value)
     {
-        bool result = cardStack.TryPop(out value);
+        bool result = cardStack.TryDequeue(out value);
         if(result)
         {
             OnStackChanged?.Invoke();
         }
         return result;
+    }
+
+    public int GetSize()
+    {
+        return cardStack.Count;
     }
 }
