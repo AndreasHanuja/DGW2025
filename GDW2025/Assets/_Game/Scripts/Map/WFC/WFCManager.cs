@@ -24,28 +24,13 @@ namespace Game.Map.WFC
         private short[,] outputCached;
         #endregion
 
-        public IEnumerable<WFCOutputChange> WFC_Init(int mapSize, int seed, List<PlyModelPrefab> prefabs)
+        public void WFC_Init(int mapSize, int seed, List<PlyModelPrefab> prefabs)
         {
             this.mapSize = mapSize;
             this.seed = seed;
             this.prefabs = prefabs;
 
-            InitCaches();
-            InitInitialPossibilities();
-
-            List<Vector2Int> uncollapsedPositions = new();
-            HashSet<Vector2Int> propagatePositions = new();
-            InitInitialPositions(uncollapsedPositions, propagatePositions);
-
-            PropagateAll(propagatePositions, initialPossibilities);
-            HashSet<short>[,] possibilities = DeepCopyInitialPossibilities();
-            while (uncollapsedPositions.Any())
-            {
-                PropagateAll(propagatePositions, possibilities);
-                CollapseBest(uncollapsedPositions, possibilities, propagatePositions);
-            }
-
-            return Output(possibilities);
+            InitCaches();          
         }
         public IEnumerable<WFCOutputChange> WFC_Iterate(IEnumerable<WFCInputChange> inputs)
         {

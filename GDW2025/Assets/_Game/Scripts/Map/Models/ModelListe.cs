@@ -47,5 +47,7 @@ public class ModelListe : MonoBehaviour
         emptyPrefab.id = prefabs.Count;
         emptyPrefab.data = new int[0];
         prefabs.Add(emptyPrefab);
+
+        WFCManager.Instance.WFC_Init(12, 0, prefabs);
     }
 }
