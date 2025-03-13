@@ -21,12 +21,9 @@ public class ModelListe : MonoBehaviour
 
         foreach (PlyModelSetup setup in models)
         {
-            if(setup.createdPrefabs.Count != 8)
-            {
-                setup.LoadModel();
-                setup.SetHashs();
-            }
-            for (int i = 0; i < 8; i++)
+            setup.LoadModel();
+            setup.SetHashs();
+            for (int i = 0; i < setup.createdPrefabs.Count; i++)
             {
                 prefabs.Add(setup.createdPrefabs[i]);
             }
@@ -51,14 +48,6 @@ public class ModelListe : MonoBehaviour
         emptyPrefab.data = new int[0];
         prefabs.Add(emptyPrefab);
 
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
-        IEnumerable<WFCOutputChange> output = WFCManager.Instance.WFC_Init(12, 0, prefabs);
-        UnityEngine.Debug.Log("WFC took " + stopwatch.ElapsedMilliseconds);
-
-        stopwatch.Restart();
-        Parallel.ForEach(output, o => VoxelPresenter.Instance.SetStructure(new Vector3Int(o.position.x * 16, 0, o.position.y * 16), prefabs[o.value].data));
-        UnityEngine.Debug.Log("Meshing took " + stopwatch.ElapsedMilliseconds);
-
+        WFCManager.Instance.WFC_Init(12, 0, prefabs);
     }
 }

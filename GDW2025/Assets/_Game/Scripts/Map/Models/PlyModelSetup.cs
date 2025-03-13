@@ -22,7 +22,7 @@ namespace Game.Map.Models
         {
             createdPrefabs.Clear();
 
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 4; i++)
             {
                 PlyModelPrefab prefab = new PlyModelPrefab();
                 prefab.allowedInputs = allowedInputs.ToList();
@@ -62,13 +62,12 @@ namespace Game.Map.Models
                         headerFinish = true;
                     }
                 }
-
-                int minX = -7;//unsortedValues.Min(v => v.x);
+                int minX = -8;
                 int minY = unsortedValues.Min(v => v.y);
                 int maxY = unsortedValues.Max(v => v.y);
-                int minZ = -7;// unsortedValues.Min(v => v.z);
+                int minZ = -8;
 
-                for(int i= 0; i < 8; i++)
+                for(int i= 0; i < createdPrefabs.Count; i++)
                 {
                     createdPrefabs[i].InitHeight(maxY - minY + 1);
                 }
@@ -85,10 +84,12 @@ namespace Game.Map.Models
                     createdPrefabs[2].SetData(maxSize - x, y, maxSize - z, block.w);                    //normal rotiert 180°
                     createdPrefabs[3].SetData(maxSize - z, y, x, block.w);                              //normal rotiert 270°
 
+                    /*
                     createdPrefabs[4].SetData(maxSize - x, y, z, block.w);                              //gespiegelt
                     createdPrefabs[5].SetData(maxSize - z, y, maxSize - x, block.w);                    //gespiegelt rotiert 90°
                     createdPrefabs[6].SetData(x, y, maxSize - z, block.w);                              //gespiegelt rotiert 180°
                     createdPrefabs[7].SetData(z, y, x, block.w);                                        //gespiegelt rotiert 270°
+                    */
                 }                
             }
 
@@ -99,7 +100,7 @@ namespace Game.Map.Models
 
         public void SetHashs()
         {
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < createdPrefabs.Count; i++)
             {
                 List<int> data = new List<int>();
 

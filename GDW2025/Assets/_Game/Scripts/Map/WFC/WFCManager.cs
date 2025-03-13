@@ -24,28 +24,13 @@ namespace Game.Map.WFC
         private short[,] outputCached;
         #endregion
 
-        public IEnumerable<WFCOutputChange> WFC_Init(int mapSize, int seed, List<PlyModelPrefab> prefabs)
+        public void WFC_Init(int mapSize, int seed, List<PlyModelPrefab> prefabs)
         {
             this.mapSize = mapSize;
             this.seed = seed;
             this.prefabs = prefabs;
 
-            InitCaches();
-            InitInitialPossibilities();
-
-            List<Vector2Int> uncollapsedPositions = new();
-            HashSet<Vector2Int> propagatePositions = new();
-            InitInitialPositions(uncollapsedPositions, propagatePositions);
-
-            PropagateAll(propagatePositions, initialPossibilities);
-            HashSet<short>[,] possibilities = DeepCopyInitialPossibilities();
-            while (uncollapsedPositions.Any())
-            {
-                PropagateAll(propagatePositions, possibilities);
-                CollapseBest(uncollapsedPositions, possibilities, propagatePositions);
-            }
-
-            return Output(possibilities);
+            InitCaches();          
         }
         public IEnumerable<WFCOutputChange> WFC_Iterate(IEnumerable<WFCInputChange> inputs)
         {
@@ -171,7 +156,7 @@ namespace Game.Map.WFC
             }
 
             System.Random random = new System.Random(position.GetHashCode() + seed);
-            short selectedPossibility = possibilities[position.x, position.y].MaxBy(p => prefabs[p].weight * random.Next(10000));
+            short selectedPossibility = possibilities[position.x, position.y].MaxBy(p => prefabs[p].weight * random.Next(1000));
 
             possibilities[position.x, position.y].Clear();
             possibilities[position.x, position.y].Add(selectedPossibility);
@@ -219,6 +204,22 @@ namespace Game.Map.WFC
         {
             PlyModelPrefab myPrefab = prefabs[possibility];
 
+            if(position.x == 0 && !myPrefab.CheckConnectivity(prefabs.Last(), Vector2Int.left))
+            {
+                return false;
+            }
+            if (position.x == mapSize - 1 && !myPrefab.CheckConnectivity(prefabs.Last(), Vector2Int.right))
+            {
+                return false;
+            }
+            if (position.y == 0 && !myPrefab.CheckConnectivity(prefabs.Last(), Vector2Int.down))
+            {
+                return false;
+            }
+            if (position.y == mapSize - 1 && !myPrefab.CheckConnectivity(prefabs.Last(), Vector2Int.up))
+            {
+                return false;
+            }
             foreach (Vector2Int neighbor in GetNeighbours(position))
             {
                 if (possibilities[neighbor.x, neighbor.y].Any(p => myPrefab.CheckConnectivity(prefabs[p], neighbor - position)))
@@ -260,7 +261,7 @@ namespace Game.Map.WFC
                     short output = possibilities[x, y].First();
                     if (outputCached[x, y] != output) 
                     {
-                        changes.Add(new WFCOutputChange() { position = new Vector2Int(x, y), value = output });
+                        changes.Add(new WFCOutputChange() { position = new Vector2Int(x, y), oldValue = outputCached[x, y], newValue = output });
                         outputCached[x, y] = output;
                     }
                 }
@@ -283,7 +284,8 @@ namespace Game.Map.WFC
     public struct WFCOutputChange
     {
         public Vector2Int position;
-        public short value;
+        public short oldValue;
+        public short newValue;
     }
     #endregion
 }
