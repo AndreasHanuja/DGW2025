@@ -49,6 +49,7 @@ namespace Game.Map.Models
                     {
                         string[] values = line.Split(' ');
 
+                        Debug.Log(fullPath);
                         int xCord = int.Parse(values[0]);
                         int yCord = int.Parse(values[2]);
                         int zCord = int.Parse(values[1]);
