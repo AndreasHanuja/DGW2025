@@ -74,7 +74,7 @@ namespace Game.Map.Models
 
                 for(int i= 0; i < createdPrefabs.Count; i++)
                 {
-                    createdPrefabs[i].InitHeight(maxY - minY + 5);
+                    createdPrefabs[i].InitHeight(maxY - minY + 1);
                 }
 
                 foreach (int4 block in unsortedValues)
