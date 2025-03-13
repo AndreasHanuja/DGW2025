@@ -25,6 +25,10 @@ namespace Game.Map.WFC
         private short[,] outputCached;
         #endregion
 
+        public List<PlyModelPrefab> GetPrefabs()
+        {
+            return prefabs.ToList();
+        }
         public void WFC_Init(int mapSize, int seed, List<PlyModelPrefab> prefabs, byte[,] groundCache)
         {
             this.mapSize = mapSize;

@@ -13,6 +13,7 @@ namespace Game.Map.Models
         [SerializeField, HideInInspector] public int height;
 
          public int[] data;
+        public PlyModelSetup setup;
         [HideInInspector] public List<int> allowedInputs = new List<int>();
         [HideInInspector] public List<int> allowedGround = new List<int>();
         public float weight;

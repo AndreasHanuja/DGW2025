@@ -31,7 +31,8 @@ namespace Game.Map.Models
                 prefab.allowedInputs = allowedInputs.ToList();
                 prefab.allowedGround = allowedGround.ToList();
                 prefab.weight = weight;
-                createdPrefabs.Add(prefab);                
+                createdPrefabs.Add(prefab);
+                prefab.setup = this;
             }
 
             string fullPath = Path.Combine(Application.dataPath, ".Models/"+ name.Replace("-", "/") + ".ply");
