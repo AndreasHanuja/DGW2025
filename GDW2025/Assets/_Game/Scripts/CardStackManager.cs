@@ -15,6 +15,7 @@ public class CardStackManager : SingeltonMonoBehaviour<CardStackManager>
 	private int nextCardPointTpreshold = 0;
 	private int totalAddedCards = 0;
 
+	public bool CanDrawBuilding => CardStackSize > 0;
 	public event System.Action<int> CardStackSizeChanged;
 	public event System.Action<byte> CurrentCardChanged;
 

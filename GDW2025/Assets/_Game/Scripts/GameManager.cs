@@ -32,7 +32,7 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 	private StateMachine<State, Trigger> stateMachiene;
 	private StateMachine<State, Trigger>.TriggerWithParameters<List<WFCResolvedChange>> placeBuildingTrigger;
 	private bool displayState = false;
-	private bool CanDrawBuilding => true;
+	private bool CanDrawBuilding => CardStackManager.Instance.CanDrawBuilding;
 	public event Action<StateMachine<State, Trigger>.Transition> OnTransitioned;
 
 	protected override void Awake()
