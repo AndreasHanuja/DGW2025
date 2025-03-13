@@ -27,6 +27,7 @@ namespace Game.Map.Voxel
                     chunks[chunkKey].transform.position = chunkKey;
                 }
                 MeshFilter meshFilter = chunks[chunkKey];
+                meshFilter.mesh = new Mesh();
                 meshFilter.mesh.SetVertices(vertices);
                 meshFilter.mesh.SetTriangles(triangles, 0);
                 meshFilter.mesh.SetColors(colors);
@@ -136,14 +137,11 @@ namespace Game.Map.Voxel
 
         private bool IsEmpty(int[] values, Vector3Int p)
         {
-            return p.x >= 0 && 
-                p.x < VoxelModel.chunkSize && 
-                p.y >= 0 &&
-                p.y < VoxelModel.chunkSize && 
-                p.z >= 0 &&
-                p.z < VoxelModel.chunkSize &&
-                values[p.x + 
-                    p.z * VoxelModel.chunkSize + 
+            return p.x < 0 || p.x >= VoxelModel.chunkSize ||
+                 p.y < 0 || p.y >= VoxelModel.chunkSize ||
+                 p.z < 0 || p.z >= VoxelModel.chunkSize ||
+                 values[p.x +
+                    p.z * VoxelModel.chunkSize +
                     p.y * VoxelModel.chunkSize * VoxelModel.chunkSize] == 0;
         }
     }

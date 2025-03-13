@@ -45,6 +45,10 @@ namespace Game.Map.Voxel
         {
             Vector3Int chunkKeyTmp = position;
             int currentIndex = 0;
+            if(values.Length > 4100)
+            {
+                int iads = 0;
+            }
             while(currentIndex < values.Length)
             {
                 model.ClearChunk(chunkKeyTmp);
@@ -52,9 +56,11 @@ namespace Game.Map.Voxel
                 int elementsToCopy = Mathf.Min(values.Length - currentIndex, chunkData.Length);
                 Array.Copy(values, currentIndex, chunkData, 0, elementsToCopy);
                 currentIndex += elementsToCopy;
+                model.UpdateChunk(chunkKeyTmp);
                 chunkKeyTmp.y += VoxelModel.chunkSize;
-                model.UpdateChunk(position);
-            }          
+            }
+            model.ClearChunk(chunkKeyTmp);
+            model.UpdateChunk(chunkKeyTmp);
         }
         public void AnimateStructure(Vector3Int position, int[,,] values, float duration)
         {

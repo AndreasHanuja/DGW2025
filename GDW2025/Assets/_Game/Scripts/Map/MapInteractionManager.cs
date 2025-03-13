@@ -1,15 +1,26 @@
+using Game.Map.Models;
 using Game.Map.Voxel;
 using Game.Map.WFC;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Game.Map
 {
-    public class MapInteractionManager : MonoBehaviour
+    public class MapInteractionManager : SingeltonMonoBehaviour<MapInteractionManager>
     {
         [SerializeField] private Raycast raycast;
         [SerializeField] private ModelListe modelListe;
+
+        public struct WFCResolvedChange
+        {
+            public Vector2Int position;
+            public PlyModelSetup oldValue;
+            public PlyModelSetup newValue;
+
+        }
+        public event Action<List<WFCResolvedChange>> OnResolvedOutputChanged; //@Gandi für dich <3
 
         private void Start()
         {

@@ -21,12 +21,9 @@ public class ModelListe : MonoBehaviour
 
         foreach (PlyModelSetup setup in models)
         {
-            if(setup.createdPrefabs.Count != 8)
-            {
-                setup.LoadModel();
-                setup.SetHashs();
-            }
-            for (int i = 0; i < 8; i++)
+            setup.LoadModel();
+            setup.SetHashs();
+            for (int i = 0; i < setup.createdPrefabs.Count; i++)
             {
                 prefabs.Add(setup.createdPrefabs[i]);
             }

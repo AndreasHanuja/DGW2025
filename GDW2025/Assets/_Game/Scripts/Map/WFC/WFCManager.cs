@@ -171,7 +171,7 @@ namespace Game.Map.WFC
             }
 
             System.Random random = new System.Random(position.GetHashCode() + seed);
-            short selectedPossibility = possibilities[position.x, position.y].MaxBy(p => prefabs[p].weight * random.Next(10000));
+            short selectedPossibility = possibilities[position.x, position.y].MaxBy(p => prefabs[p].weight * random.Next(1000));
 
             possibilities[position.x, position.y].Clear();
             possibilities[position.x, position.y].Add(selectedPossibility);
@@ -219,6 +219,22 @@ namespace Game.Map.WFC
         {
             PlyModelPrefab myPrefab = prefabs[possibility];
 
+            if(position.x == 0 && !myPrefab.CheckConnectivity(prefabs.Last(), Vector2Int.left))
+            {
+                return false;
+            }
+            if (position.x == mapSize - 1 && !myPrefab.CheckConnectivity(prefabs.Last(), Vector2Int.right))
+            {
+                return false;
+            }
+            if (position.y == 0 && !myPrefab.CheckConnectivity(prefabs.Last(), Vector2Int.down))
+            {
+                return false;
+            }
+            if (position.y == mapSize - 1 && !myPrefab.CheckConnectivity(prefabs.Last(), Vector2Int.up))
+            {
+                return false;
+            }
             foreach (Vector2Int neighbor in GetNeighbours(position))
             {
                 if (possibilities[neighbor.x, neighbor.y].Any(p => myPrefab.CheckConnectivity(prefabs[p], neighbor - position)))
@@ -283,7 +299,8 @@ namespace Game.Map.WFC
     public struct WFCOutputChange
     {
         public Vector2Int position;
-        public short value;
+        public short oldValue;
+        public short newValue;
     }
     #endregion
 }
