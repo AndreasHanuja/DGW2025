@@ -51,14 +51,14 @@ namespace Game.Map.WFC
             InitInitialPositions(uncollapsedPositions, propagatePositions);
 
             PropagateAll(propagatePositions, initialPossibilities);
-            HashSet<short>[,] possibilities = DeepCopyInitialPossibilities();
+            //HashSet<short>[,] possibilities = DeepCopyInitialPossibilities();
             while (uncollapsedPositions.Any())
             {
-                PropagateAll(propagatePositions, possibilities);
-                CollapseBest(uncollapsedPositions, possibilities, propagatePositions);
+                PropagateAll(propagatePositions, initialPossibilities);
+                CollapseBest(uncollapsedPositions, initialPossibilities, propagatePositions);
             }
 
-            return Output(possibilities);
+            return Output(initialPossibilities);
 
             /*List<Vector2Int> uncollapsedPositions = new();
             HashSet<Vector2Int> propagatePositions = new();
