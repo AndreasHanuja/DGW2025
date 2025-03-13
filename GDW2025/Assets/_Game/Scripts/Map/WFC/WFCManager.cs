@@ -1,8 +1,9 @@
 using Game.Map.Models;
+using Game.Map.Voxel;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.Windows;
 
 namespace Game.Map.WFC
 {
@@ -24,16 +25,24 @@ namespace Game.Map.WFC
         private short[,] outputCached;
         #endregion
 
-        public void WFC_Init(int mapSize, int seed, List<PlyModelPrefab> prefabs)
+        public List<PlyModelPrefab> GetPrefabs()
+        {
+            return prefabs.ToList();
+        }
+        public void WFC_Init(int mapSize, int seed, List<PlyModelPrefab> prefabs, byte[,] groundCache)
         {
             this.mapSize = mapSize;
             this.seed = seed;
             this.prefabs = prefabs;
+            this.groundCached = groundCache;
 
             InitCaches();          
         }
         public IEnumerable<WFCOutputChange> WFC_Iterate(IEnumerable<WFCInputChange> inputs)
         {
+            if(inputs.Any(i => inputCached[i.position.x, i.position.y] != 0)){
+                return new List<WFCOutputChange>();
+            }
             foreach (WFCInputChange input in inputs)
             {
                 inputCached[input.position.x, input.position.y] = input.value;
@@ -46,14 +55,14 @@ namespace Game.Map.WFC
             InitInitialPositions(uncollapsedPositions, propagatePositions);
 
             PropagateAll(propagatePositions, initialPossibilities);
-            HashSet<short>[,] possibilities = DeepCopyInitialPossibilities();
+            //HashSet<short>[,] possibilities = DeepCopyInitialPossibilities();
             while (uncollapsedPositions.Any())
             {
-                PropagateAll(propagatePositions, possibilities);
-                CollapseBest(uncollapsedPositions, possibilities, propagatePositions);
+                PropagateAll(propagatePositions, initialPossibilities);
+                CollapseBest(uncollapsedPositions, initialPossibilities, propagatePositions);
             }
 
-            return Output(possibilities);
+            return Output(initialPossibilities);
 
             /*List<Vector2Int> uncollapsedPositions = new();
             HashSet<Vector2Int> propagatePositions = new();
@@ -85,11 +94,10 @@ namespace Game.Map.WFC
         #region HELPER FUNCTIONS
         private void InitCaches()
         {
-            groundCached = new byte[mapSize, mapSize];
             inputCached = new byte[mapSize, mapSize];
             outputCached = new short[mapSize, mapSize];
 
-            for(int x = 0; x < mapSize; x++)
+            for (int x = 0; x < mapSize; x++)
             {
                 for (int y = 0; y < mapSize; y++)
                 {
@@ -156,7 +164,7 @@ namespace Game.Map.WFC
             }
 
             System.Random random = new System.Random(position.GetHashCode() + seed);
-            short selectedPossibility = possibilities[position.x, position.y].MaxBy(p => prefabs[p].weight * random.Next(1000));
+            short selectedPossibility = possibilities[position.x, position.y].MaxBy(p => prefabs[p].weight * random.Next(10));
 
             possibilities[position.x, position.y].Clear();
             possibilities[position.x, position.y].Add(selectedPossibility);

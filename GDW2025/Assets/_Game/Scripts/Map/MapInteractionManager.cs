@@ -31,7 +31,7 @@ namespace Game.Map
 
         private void MapClickHandler(Vector2 clickPosition)
         {
-            if(!GameManager.Instance.IsInState(GameManager.State.PlacingBuilding) && false) //@Gandi bitte das false weg machen wenn die States gehen
+            if(!GameManager.Instance.IsInState(GameManager.State.SelectingBuildingPlacement)) 
             {
                 return;
             }
@@ -45,7 +45,15 @@ namespace Game.Map
 
             if (outputChange.Count() > 0)
             {
-                CardStackManager.Instance.TryPop(out byte value);
+                List<PlyModelPrefab> prefabs = WFCManager.Instance.GetPrefabs();
+                GameManager.Instance.PlacedBuilding(
+                    outputChange.Select(o => {
+                        return new WFCResolvedChange { 
+                            position = o.position,  
+                            newValue = o.newValue == -1 ? null : prefabs[o.newValue].setup, 
+                            oldValue = o.oldValue == -1 ? null : prefabs[o.oldValue].setup
+                        };
+                    }).ToList());
             }
         }
     }

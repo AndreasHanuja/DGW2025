@@ -45,10 +45,6 @@ namespace Game.Map.Voxel
         {
             Vector3Int chunkKeyTmp = position;
             int currentIndex = 0;
-            if(values.Length > 4100)
-            {
-                int iads = 0;
-            }
             while(currentIndex < values.Length)
             {
                 model.ClearChunk(chunkKeyTmp);

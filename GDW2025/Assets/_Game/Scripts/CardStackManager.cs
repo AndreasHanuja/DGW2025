@@ -1,41 +1,91 @@
-using System;
 using System.Collections.Generic;
+using UnityEngine;
+using static Game.Map.MapInteractionManager;
+using GameManagerTransition = Stateless.StateMachine<GameManager.State, GameManager.Trigger>.Transition;
 
-public class CardStackManager
+public class CardStackManager : SingeltonMonoBehaviour<CardStackManager>
 {
-    public static CardStackManager Instance = new CardStackManager();
-    public Action OnStackChanged;
-    private CardStackManager()
+	[SerializeField]
+	private int startCardDeckSize = 5;
+
+	private byte currentCard = 0;
+	public byte CurrentCard { get => currentCard; private set { currentCard = value; CurrentCardChanged?.Invoke(currentCard); } }
+	private int cardStackSize = 0;
+	public int CardStackSize { get => cardStackSize; private set { cardStackSize = value; CardStackSizeChanged?.Invoke(cardStackSize); } }
+	private int nextCardPointTpreshold = 0;
+	private int totalAddedCards = 0;
+
+	public bool CanDrawBuilding => CardStackSize > 0;
+	public event System.Action<int> CardStackSizeChanged;
+	public event System.Action<byte> CurrentCardChanged;
+
+	private void Start()
+	{
+		GameManager.Instance.OnTransitioned += OnGameManagerTransition;
+		PointsManager.Instance.PointsChanged += AddCardWhenThresholdReched;
+	}
+
+	private void OnDestroy()
+	{
+		GameManager.Instance.OnTransitioned -= OnGameManagerTransition;
+		PointsManager.Instance.PointsChanged -= AddCardWhenThresholdReched;
+	}
+
+	private void OnGameManagerTransition(GameManagerTransition transition)
+	{
+		if (transition.Destination == GameManager.State.Starting)
+		{
+			CurrentCard = 0;
+			CardStackSize = startCardDeckSize;
+			totalAddedCards = 0;
+			nextCardPointTpreshold = CardThresholdFunction(totalAddedCards);
+		}
+
+		if (transition.Destination == GameManager.State.DrawingBuilding)
+		{
+			DrawCard();
+			GameManager.Instance.FireTrigger(GameManager.Trigger.DrawBuildingCompleted);
+		}
+	}
+
+	private void DrawCard()
+	{
+		if (CardStackSize <= 0)
+		{
+			throw new System.InvalidOperationException("User hat ne Karte gezogen, soll er aber nicht wenns keine gibt!");
+		}
+
+		CardStackSize--;
+		CurrentCard = (byte)Random.Range(0, 8);
+	}
+
+	public bool TryPeek(out byte value)
     {
-        for(int i = 0; i < 50; i++)
-        {
-            cardStack.Enqueue((byte)(1 + (i % 8)));
-        }
+		value = CurrentCard;
+        return CurrentCard > 0;
     }
 
-    private Queue<byte> cardStack = new();
-
-    public bool TryPeek(out byte value)
-    {
-        return cardStack.TryPeek(out value);
-    }
-    public void Push(byte value) //@Gandi hier bitte Karten in den Stack adden <3
-    {
-        cardStack.Enqueue(value);
-        OnStackChanged?.Invoke();
-    }
     public bool TryPop(out byte value)
     {
-        bool result = cardStack.TryDequeue(out value);
-        if(result)
-        {
-            OnStackChanged?.Invoke();
-        }
-        return result;
-    }
+		value = CurrentCard;
+		CurrentCard = 0;
+		return CurrentCard > 0;
+	}
 
-    public int GetSize()
-    {
-        return cardStack.Count;
-    }
+	private void AddCardWhenThresholdReched(int points)
+	{
+		if (points < nextCardPointTpreshold)
+		{
+			return;
+		}
+
+		CardStackSize++;
+		totalAddedCards++;
+		nextCardPointTpreshold = CardThresholdFunction(totalAddedCards);
+	}
+
+	private int CardThresholdFunction(int i)
+	{
+		return (i * i) + 10;
+	}
 }
