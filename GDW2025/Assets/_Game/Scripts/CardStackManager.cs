@@ -43,6 +43,7 @@ public class CardStackManager : SingeltonMonoBehaviour<CardStackManager>
 		if (transition.Destination == GameManager.State.DrawingBuilding)
 		{
 			DrawCard();
+			GameManager.Instance.FireTrigger(GameManager.Trigger.DrawBuildingCompleted);
 		}
 	}
 

@@ -3,6 +3,7 @@ using Stateless.Graph;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static Game.Map.MapInteractionManager;
 
 public class GameManager : SingeltonMonoBehaviour<GameManager>
@@ -30,6 +31,7 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 
 	private StateMachine<State, Trigger> stateMachiene;
 	private StateMachine<State, Trigger>.TriggerWithParameters<List<WFCResolvedChange>> placeBuildingTrigger;
+	private bool displayState = false;
 	private bool CanDrawBuilding => true;
 	public event Action<StateMachine<State, Trigger>.Transition> OnTransitioned;
 
@@ -72,6 +74,20 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 		//Debug.Log(UmlDotGraph.Format(stateMachiene.GetInfo()));
 	}
 
+
+	private void OnGUI()
+	{
+		if (!displayState)
+		{
+			return;
+		}
+
+		GUIStyle guiStyle = new GUIStyle();
+		guiStyle.fontSize = 20;
+		guiStyle.normal.textColor = Color.white;
+		GUI.Label(new Rect(10, 10, 500, 30), $"GameManager: {stateMachiene.State}", guiStyle);
+	}
+
 	public void FireTrigger(Trigger trigger)
 	{
 		stateMachiene.Fire(trigger);
@@ -85,5 +101,11 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 	public bool IsInState(State state)
 	{
 		return stateMachiene.IsInState(state);
+	}
+
+	[ContextMenu("Display State")]
+	private void DosplayState()
+	{
+		displayState = !displayState;
 	}
 }
