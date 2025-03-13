@@ -4,6 +4,7 @@ using Game.Map.WFC;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 namespace Game.Map.Voxel
 {
@@ -41,7 +42,7 @@ namespace Game.Map.Voxel
             model.UpdateDirtyChunks();
         }
 
-        public void SetStructure(Vector3Int position, int[] values)
+        public void SetStructure(Vector3Int position, int[] values, bool clearAirAboveStructure = true)
         {
             Vector3Int chunkKeyTmp = position;
             int currentIndex = 0;
@@ -55,8 +56,11 @@ namespace Game.Map.Voxel
                 model.UpdateChunk(chunkKeyTmp);
                 chunkKeyTmp.y += VoxelModel.chunkSize;
             }
-            model.ClearChunk(chunkKeyTmp);
-            model.UpdateChunk(chunkKeyTmp);
+            if (clearAirAboveStructure)
+            {
+                model.ClearChunk(chunkKeyTmp);
+                model.UpdateChunk(chunkKeyTmp);
+            }
         }
         public void AnimateStructure(Vector3Int position, int[,,] values, float duration)
         {
@@ -105,7 +109,7 @@ namespace Game.Map.Voxel
             {
                 ints[3840 + i] = color;
             }
-            SetStructure(new Vector3Int(gridPosition.x * 16, -16, gridPosition.y * 16), ints);
+            SetStructure(new Vector3Int(gridPosition.x * 16, -16, gridPosition.y * 16), ints, false);
         }
         private int GroundToColor(byte ground)
         {

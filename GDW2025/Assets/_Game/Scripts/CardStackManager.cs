@@ -56,7 +56,7 @@ public class CardStackManager : SingeltonMonoBehaviour<CardStackManager>
 		}
 
 		CardStackSize--;
-		CurrentCard = (byte)Random.Range(0, 8);
+		CurrentCard = (byte)Random.Range(1, 9);
 	}
 
 	public bool TryPeek(out byte value)

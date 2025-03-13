@@ -605,6 +605,7 @@ MonoBehaviour:
   drawPileSize: {fileID: 798438732}
   cardImage: {fileID: 28658214}
   images:
+  - {fileID: 21300000, guid: 2f9d3ee900e77e34abbcab368ae19320, type: 3}
   - {fileID: 21300000, guid: 296401ace714abf448fbf62a24395435, type: 3}
   - {fileID: 21300000, guid: 0aac37567045398499ca1e8c91b129ef, type: 3}
   - {fileID: 21300000, guid: 4e7ecf088c529cb4385462d07aa59663, type: 3}
@@ -683,6 +684,10 @@ PrefabInstance:
     - target: {fileID: 5783708003006214105, guid: 1e5b9e4312125d046b8e53f9e7146ba1, type: 3}
       propertyPath: m_Name
       value: Managers
+      objectReference: {fileID: 0}
+    - target: {fileID: 8382141932688716664, guid: 1e5b9e4312125d046b8e53f9e7146ba1, type: 3}
+      propertyPath: startCardDeckSize
+      value: 50
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

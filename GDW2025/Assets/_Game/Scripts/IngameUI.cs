@@ -13,6 +13,8 @@ public class IngameUI : MonoBehaviour
     {
         CardStackManager.Instance.CardStackSizeChanged += CardStackSizeChangedHandler;
         CardStackManager.Instance.CurrentCardChanged += CurrentCardChangedHandler;
+        CardStackManager.Instance.TryPeek(out byte value);
+        CurrentCardChangedHandler(value);
     }
 
     private void CardStackSizeChangedHandler(int cardStackSize)

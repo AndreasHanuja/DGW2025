@@ -59,8 +59,6 @@ namespace Game.Map.WFC
             HashSet<Vector2Int> propagatePositions = new();
             InitInitialPositions(uncollapsedPositions, propagatePositions);
 
-            PropagateAll(propagatePositions, initialPossibilities);
-            //HashSet<short>[,] possibilities = DeepCopyInitialPossibilities();
             while (uncollapsedPositions.Any())
             {
                 PropagateAll(propagatePositions, initialPossibilities);
