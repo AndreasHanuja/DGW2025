@@ -29,12 +29,13 @@ namespace Game.Map
 
         private void MapClickHandler(Vector2 clickPosition)
         {
+            CardStackManager.Instance.TryPeek(out byte currentCard);
             List<WFCInputChange> inputs = new List<WFCInputChange>
             {
-                new WFCInputChange() { position = Vector2Int.RoundToInt(clickPosition), Type = ChangeType.Input, value = 1 }
+                new WFCInputChange() { position = Vector2Int.RoundToInt(clickPosition), Type = ChangeType.Input, value = currentCard }
             };
             IEnumerable<WFCOutputChange> outputChange = WFCManager.Instance.WFC_Iterate(inputs);
-            Parallel.ForEach(outputChange, o => VoxelPresenter.Instance.SetStructure(new Vector3Int(o.position.x * 16, 0, o.position.y * 16), modelListe.prefabs[o.value].data));
+            Parallel.ForEach(outputChange, o => VoxelPresenter.Instance.SetStructure(new Vector3Int(o.position.x * 16, 0, o.position.y * 16), modelListe.prefabs[o.newValue].data));
         }
     }
 }

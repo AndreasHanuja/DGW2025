@@ -276,7 +276,7 @@ namespace Game.Map.WFC
                     short output = possibilities[x, y].First();
                     if (outputCached[x, y] != output) 
                     {
-                        changes.Add(new WFCOutputChange() { position = new Vector2Int(x, y), value = output });
+                        changes.Add(new WFCOutputChange() { position = new Vector2Int(x, y), oldValue = outputCached[x, y], newValue = output });
                         outputCached[x, y] = output;
                     }
                 }

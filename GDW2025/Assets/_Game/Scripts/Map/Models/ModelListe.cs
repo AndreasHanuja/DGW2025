@@ -47,15 +47,5 @@ public class ModelListe : MonoBehaviour
         emptyPrefab.id = prefabs.Count;
         emptyPrefab.data = new int[0];
         prefabs.Add(emptyPrefab);
-
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
-        IEnumerable<WFCOutputChange> output = WFCManager.Instance.WFC_Init(12, 0, prefabs);
-        UnityEngine.Debug.Log("WFC took " + stopwatch.ElapsedMilliseconds);
-
-        stopwatch.Restart();
-        Parallel.ForEach(output, o => VoxelPresenter.Instance.SetStructure(new Vector3Int(o.position.x * 16, 0, o.position.y * 16), prefabs[o.value].data));
-        UnityEngine.Debug.Log("Meshing took " + stopwatch.ElapsedMilliseconds);
-
     }
 }

@@ -9,22 +9,22 @@ public class CardStackManager
     {
         for(int i = 0; i < 50; i++)
         {
-            cardStack.Push(1 + (i % 8));
+            cardStack.Push((byte)(1 + (i % 8)));
         }
     }
 
-    private Stack<int> cardStack = new();
+    private Stack<byte> cardStack = new();
 
-    public bool TryPeek(out int value)
+    public bool TryPeek(out byte value)
     {
         return cardStack.TryPeek(out value);
     }
-    public void Push(int value) //@Gandi hier bitte Karten in den Stack adden <3
+    public void Push(byte value) //@Gandi hier bitte Karten in den Stack adden <3
     {
         cardStack.Push(value);
         OnStackChanged?.Invoke();
     }
-    public bool TryPop(out int value)
+    public bool TryPop(out byte value)
     {
         bool result = cardStack.TryPop(out value);
         if(result)
