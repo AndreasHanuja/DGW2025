@@ -36,7 +36,8 @@ namespace Game.Map.Models
             }
 
             string fullPath = Path.Combine(Application.dataPath, ".Models/"+ name.Replace("-", "/") + ".ply");
-            string[] fileData = { };
+			//Debug.Log(fullPath);
+			string[] fileData = { };
 
             if (File.Exists(fullPath))
             {
@@ -66,10 +67,10 @@ namespace Game.Map.Models
                         headerFinish = true;
                     }
                 }
-                int minX = -8;
+                int minX = Mathf.RoundToInt(unsortedValues.Min(v => v.x) / 8.0f) * 8;
                 int minY = unsortedValues.Min(v => v.y);
                 int maxY = unsortedValues.Max(v => v.y);
-                int minZ = -8;
+                int minZ = Mathf.RoundToInt(unsortedValues.Min(v => v.z) / 8.0f) * 8;
 
                 for(int i= 0; i < createdPrefabs.Count; i++)
                 {
@@ -84,15 +85,15 @@ namespace Game.Map.Models
 
                     int maxSize = PlyModelPrefab.modelSize - 1;
                     createdPrefabs[0].SetData(x, y, z, block.w);                                        //normal
-                    createdPrefabs[1].SetData(z, y, maxSize - x, block.w);                              //normal rotiert 90°
-                    createdPrefabs[2].SetData(maxSize - x, y, maxSize - z, block.w);                    //normal rotiert 180°
-                    createdPrefabs[3].SetData(maxSize - z, y, x, block.w);                              //normal rotiert 270°
+                    createdPrefabs[1].SetData(z, y, maxSize - x, block.w);                              //normal rotiert 90ï¿½
+                    createdPrefabs[2].SetData(maxSize - x, y, maxSize - z, block.w);                    //normal rotiert 180ï¿½
+                    createdPrefabs[3].SetData(maxSize - z, y, x, block.w);                              //normal rotiert 270ï¿½
 
                     /*
                     createdPrefabs[4].SetData(maxSize - x, y, z, block.w);                              //gespiegelt
-                    createdPrefabs[5].SetData(maxSize - z, y, maxSize - x, block.w);                    //gespiegelt rotiert 90°
-                    createdPrefabs[6].SetData(x, y, maxSize - z, block.w);                              //gespiegelt rotiert 180°
-                    createdPrefabs[7].SetData(z, y, x, block.w);                                        //gespiegelt rotiert 270°
+                    createdPrefabs[5].SetData(maxSize - z, y, maxSize - x, block.w);                    //gespiegelt rotiert 90ï¿½
+                    createdPrefabs[6].SetData(x, y, maxSize - z, block.w);                              //gespiegelt rotiert 180ï¿½
+                    createdPrefabs[7].SetData(z, y, x, block.w);                                        //gespiegelt rotiert 270ï¿½
                     */
                 }                
             }

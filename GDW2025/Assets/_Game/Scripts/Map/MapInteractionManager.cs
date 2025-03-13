@@ -22,7 +22,6 @@ namespace Game.Map
             public PlyModelSetup newValue;
 
         }
-        public event Action<List<WFCResolvedChange>> OnResolvedOutputChanged; 
 
         private void Start()
         {
@@ -35,14 +34,36 @@ namespace Game.Map
             {
                 return;
             }
+
+
             CardStackManager.Instance.TryPeek(out byte currentCard);
             List<WFCInputChange> inputs = new List<WFCInputChange>
             {
                 new WFCInputChange() { position = Vector2Int.RoundToInt(clickPosition), Type = ChangeType.Input, value = currentCard }
             };
             IEnumerable<WFCOutputChange> outputChange = WFCManager.Instance.WFC_Iterate(inputs);            
+
+            //render new models
             Parallel.ForEach(outputChange, o => VoxelPresenter.Instance.SetStructure(new Vector3Int(o.position.x * 16, 0, o.position.y * 16), modelListe.prefabs[o.newValue].data));
 
+            //transform bioms
+            if (currentCard == 6 || currentCard == 7) 
+            {
+                IEnumerable<Vector2Int> updatedPositions = WFCManager.GetNeighbours(Vector2Int.RoundToInt(clickPosition), true);
+                byte targetGround = (byte)(currentCard == 6 ? 2 : 1);
+
+                IEnumerable<WFCOutputChange> tmp = WFCManager.Instance.WFC_Iterate(
+                    updatedPositions.Select(p =>
+                      new WFCInputChange() { position = p, Type = ChangeType.Map, value = targetGround }
+                  ).ToList());
+                Parallel.ForEach(tmp, o => VoxelPresenter.Instance.SetStructure(new Vector3Int(o.position.x * 16, 0, o.position.y * 16), modelListe.prefabs[o.newValue].data));
+
+                outputChange = outputChange.Concat(tmp);
+
+                Parallel.ForEach(updatedPositions, p => VoxelPresenter.Instance.GenerateGroundStructure(targetGround, p));
+            }
+
+            //notify game manager
             if (outputChange.Count() > 0)
             {
                 List<PlyModelPrefab> prefabs = WFCManager.Instance.GetPrefabs();

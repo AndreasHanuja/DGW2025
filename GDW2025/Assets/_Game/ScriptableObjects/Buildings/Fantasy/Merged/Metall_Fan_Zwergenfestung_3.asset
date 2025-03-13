@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a7a95d6db77a944b8dd31d3832af658, type: 3}
   m_Name: Metall_Fan_Zwergenfestung_3
   m_EditorClassIdentifier: 
-  allowedInputs: 
-  allowedGround: 
-  weight: 0
+  allowedInputs: 08000000
+  allowedGround: 02000000
+  weight: 1000000
+  pointValue: 0
   createdPrefabs: []

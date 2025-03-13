@@ -4,6 +4,7 @@ using Game.Map.WFC;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 namespace Game.Map.Voxel
 {
@@ -22,10 +23,6 @@ namespace Game.Map.Voxel
 
             Instance = this;
         }
-        private void Start()
-        {
-            //WFCPresenter.Instance.OnModelUpdated += ModelUpdatedHandler;
-        }
 
         private void OnEnable()
         {
@@ -34,14 +31,18 @@ namespace Game.Map.Voxel
         private void OnDisable()
         {
             model.OnChunkUpdated -= UpdateChunkHandler;
-            //WFCPresenter.Instance.OnModelUpdated -= ModelUpdatedHandler;
         }
 
-        public void SetValue(Vector3Int position, int value)
+        public void SetValue(Vector3Int position, int value, bool silent = false)
         {
-            model.SetValue(position, value);
+            model.SetValue(position, value, silent);
         }
-        public void SetStructure(Vector3Int position, int[] values)
+        public void UpdateDirtyChunks()
+        {
+            model.UpdateDirtyChunks();
+        }
+
+        public void SetStructure(Vector3Int position, int[] values, bool clearAirAboveStructure = true)
         {
             Vector3Int chunkKeyTmp = position;
             int currentIndex = 0;
@@ -55,8 +56,11 @@ namespace Game.Map.Voxel
                 model.UpdateChunk(chunkKeyTmp);
                 chunkKeyTmp.y += VoxelModel.chunkSize;
             }
-            model.ClearChunk(chunkKeyTmp);
-            model.UpdateChunk(chunkKeyTmp);
+            if (clearAirAboveStructure)
+            {
+                model.ClearChunk(chunkKeyTmp);
+                model.UpdateChunk(chunkKeyTmp);
+            }
         }
         public void AnimateStructure(Vector3Int position, int[,,] values, float duration)
         {
@@ -95,13 +99,38 @@ namespace Game.Map.Voxel
             return model.GetValue(position);
         }
 
+
+        public void GenerateGroundStructure(byte type, Vector2Int gridPosition)
+        {
+            int[] ints = new int[4096];
+            int color = GroundToColor(type);
+
+            for (int i = 0; i < 256; i++)
+            {
+                ints[3840 + i] = color;
+            }
+            SetStructure(new Vector3Int(gridPosition.x * 16, -16, gridPosition.y * 16), ints, false);
+        }
+        private int GroundToColor(byte ground)
+        {
+            switch (ground)
+            {
+                case 0:
+                    return (64 << 24) + (178 << 16) + (64 << 8) + 255;
+                case 1:
+                    return (200 << 24) + (200 << 16) + (200 << 8) + 255;
+                case 2:
+                    return (190 << 24) + (50 << 16) + (220 << 8) + 255;
+                case 3:
+                    return (32 << 24) + (32 << 16) + (32 << 8) + 255;
+            }
+            return 0;
+        }
+
+
         private void UpdateChunkHandler(Vector3Int chunkKey)
         {
             view.UpdateChunk(model.GetChunkData(chunkKey), chunkKey);
-        }
-        private void ModelUpdatedHandler(PlyModel plyModel)
-        {
-            SetStructure(plyModel.offset, plyModel.data);
         }
     }
 }
