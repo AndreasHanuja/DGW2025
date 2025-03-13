@@ -153,7 +153,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -36.2, y: 67.100006}
+  m_AnchoredPosition: {x: -36.19995, y: 50.48}
   m_SizeDelta: {x: 304.7, y: 250}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &28658214
@@ -176,7 +176,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 4e7ecf088c529cb4385462d07aa59663, type: 3}
+  m_Sprite: {fileID: 21300000, guid: db9b6887107b9e645be72e1e9cbc06a7, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -608,7 +608,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 62c68b87a0f9db547bc8db3b07267a91, type: 3}
   - {fileID: 21300000, guid: 696715feb2d46db488e2fcd342f70606, type: 3}
   - {fileID: 21300000, guid: 5a7ede289a462664cb03e1dd309a63a7, type: 3}
-  - {fileID: 21300000, guid: 696715feb2d46db488e2fcd342f70606, type: 3}
+  - {fileID: 21300000, guid: b68852404e758cb4dbae0f06673bc5ae, type: 3}
 --- !u!1 &1408825661 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3438460764810180833, guid: 5d0cbae9deae17e448b3b3dfddebfa39, type: 3}
