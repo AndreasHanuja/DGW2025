@@ -16,7 +16,10 @@ namespace Game.Map.Models
 
         [SerializeField] private float weight;
 
-        public List<PlyModelPrefab> createdPrefabs = new List<PlyModelPrefab>();
+		[SerializeField] private int pointValue = 0;
+        public int PointValue => pointValue;
+
+		public List<PlyModelPrefab> createdPrefabs = new List<PlyModelPrefab>();
 
         public void LoadModel()
         {
@@ -28,7 +31,8 @@ namespace Game.Map.Models
                 prefab.allowedInputs = allowedInputs.ToList();
                 prefab.allowedGround = allowedGround.ToList();
                 prefab.weight = weight;
-                createdPrefabs.Add(prefab);                
+                createdPrefabs.Add(prefab);
+                prefab.setup = this;
             }
 
             string fullPath = Path.Combine(Application.dataPath, ".Models/"+ name.Replace("-", "/") + ".ply");

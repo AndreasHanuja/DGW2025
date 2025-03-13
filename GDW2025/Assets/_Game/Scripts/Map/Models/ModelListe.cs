@@ -48,6 +48,45 @@ public class ModelListe : MonoBehaviour
         emptyPrefab.data = new int[0];
         prefabs.Add(emptyPrefab);
 
-        WFCManager.Instance.WFC_Init(12, 0, prefabs);
+
+        WFCManager.Instance.WFC_Init(12, 0, prefabs, GenerateMap());
+    }
+
+    private byte[,] GenerateMap()
+    {
+        byte[,] data = new byte[12, 12];
+
+        Random.InitState(0);
+        for (int x = 0; x < 12; x++) 
+        {
+            for (int y = 0; y < 12; y++)
+            {
+                data[x, y] = (byte)Random.Range(0, 3);
+
+                int[] ints = new int[4096];
+                int color = 0;
+                switch(data[x, y])
+                {
+                    case 0:
+                        color = (64 << 24) + (178 << 16) + (64 << 8) + 255;
+                        break;
+                    case 1:
+                        color = (200 << 24) + (200 << 16) + (200 << 8) + 255;
+                        break;
+                    case 2:
+                        color = (190 << 24) + (50 << 16) + (220 << 8) + 255;
+                        break;
+                    case 3:
+                        color = (32 << 24) + (32 << 16) + (32 << 8) + 255;
+                        break;
+                }
+                for(int i = 0; i < 256; i++)
+                {
+                    ints[3840+i] = color;
+                }
+                VoxelPresenter.Instance.SetStructure(new Vector3Int(x * 16, -16, y * 16), ints);
+            }
+        }
+        return data;
     }
 }
