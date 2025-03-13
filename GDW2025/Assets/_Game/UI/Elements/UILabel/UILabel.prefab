@@ -88,8 +88,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: '[Label]'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 08979e7281c89884396e92347c7055de, type: 2}
-  m_sharedMaterial: {fileID: 9002621612994127517, guid: 08979e7281c89884396e92347c7055de, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5cc624069e16f794fb3f5107f50a4861, type: 2}
+  m_sharedMaterial: {fileID: 3913605978607230784, guid: 5cc624069e16f794fb3f5107f50a4861, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
