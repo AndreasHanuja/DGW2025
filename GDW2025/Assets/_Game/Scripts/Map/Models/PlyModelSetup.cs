@@ -16,7 +16,10 @@ namespace Game.Map.Models
 
         [SerializeField] private float weight;
 
-        public List<PlyModelPrefab> createdPrefabs = new List<PlyModelPrefab>();
+		[SerializeField] private int pointValue = 0;
+        public int PointValue => pointValue;
+
+		public List<PlyModelPrefab> createdPrefabs = new List<PlyModelPrefab>();
 
         public void LoadModel()
         {

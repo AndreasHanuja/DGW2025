@@ -51,7 +51,8 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 			.Permit(Trigger.EnterLevel, State.Starting);
 
 		stateMachiene.Configure(State.Starting)
-			.Permit(Trigger.StartingCompleted, State.DrawingBuilding);
+			.Permit(Trigger.StartingCompleted, State.DrawingBuilding)
+			.OnEntry(() => FireTrigger(Trigger.StartingCompleted));
 
 		stateMachiene.Configure(State.DrawingBuilding)
 			.Permit(Trigger.DrawBuildingCompleted, State.SelectingBuildingPlacement);
