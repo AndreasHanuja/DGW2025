@@ -252,11 +252,11 @@ namespace Game.Map.WFC
             {
                 yield return position + Vector2Int.right;
             }
-            if (position.y > 1)
+            if (position.y > 0)
             {
                 yield return position + Vector2Int.down;
             }
-            if (position.x > 1)
+            if (position.x > 0)
             {
                 yield return position + Vector2Int.left;
             }
