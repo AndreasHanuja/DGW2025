@@ -1,4 +1,4 @@
-using Game.Map.WFC;
+﻿using Game.Map.WFC;
 using NUnit.Framework.Internal;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +18,7 @@ namespace Game.Map.Voxel
             List<Vector3> vertices = new();
             List<int> triangles = new();
             List<Color> colors = new();
-            BuildChunk(vertices, triangles, colors, chunkData);
+            BuildChunk(vertices, triangles, colors, chunkData, chunkKey);
 
             MainThreadDispatcher.Enqueue(() => {
                 if (!chunks.ContainsKey(chunkKey))
@@ -35,7 +35,7 @@ namespace Game.Map.Voxel
             });
         }
 
-        private void BuildChunk(List<Vector3> vertices, List<int> triangles, List<Color> colors, int[] chunkData)
+        private void BuildChunk(List<Vector3> vertices, List<int> triangles, List<Color> colors, int[] chunkData, Vector3Int chunkKey)
         {
             for(int x = 0; x < VoxelModel.chunkSize; x++)
             {
@@ -112,7 +112,8 @@ namespace Game.Map.Voxel
                              (chunkValue & 255) / 255f
                         );
                         Color.RGBToHSV(voxelColor, out float h, out float s, out float v);
-                        System.Random random = new System.Random(position.GetHashCode());
+                        Vector3Int pos = chunkKey + position;
+                        System.Random random = new System.Random(GetCombinedHash(pos.x, pos.y, pos.z));
                         v = Mathf.Clamp01(random.Next((int)((v - randomColorRange) * 100), (int)((v + randomColorRange) * 100)) / 100f);
                         voxelColor = Color.HSVToRGB(h, s, v);
 
@@ -143,6 +144,28 @@ namespace Game.Map.Voxel
                  values[p.x +
                     p.z * VoxelModel.chunkSize +
                     p.y * VoxelModel.chunkSize * VoxelModel.chunkSize] == 0;
+        }
+
+        public static int GetCombinedHash(int x, int y, int z)
+        {
+            unchecked
+            {
+                // Startwert
+                int hash = 17;
+                // Kombiniere die Werte mit Primzahl‑Multiplikation
+                hash = hash * 31 + x;
+                hash = hash * 31 + y;
+                hash = hash * 31 + z;
+
+                // Abschließende Bit‑Mischung für eine bessere Verteilung
+                hash ^= (hash >> 15);
+                hash *= (int)0x85ebca6b;
+                hash ^= (hash >> 13);
+                hash *= (int)0xc2b2ae35;
+                hash ^= (hash >> 16);
+
+                return hash;
+            }
         }
     }
 }

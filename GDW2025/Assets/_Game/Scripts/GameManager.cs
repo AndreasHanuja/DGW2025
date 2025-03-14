@@ -67,9 +67,10 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 		stateMachiene.Configure(State.PlacingBuilding)
 			.PermitIf(Trigger.PlacingBuildingCompleted, State.DrawingBuilding, () => CanDrawBuilding)
 			.PermitIf(Trigger.PlacingBuildingCompleted, State.GameOver, () => !CanDrawBuilding)
-            .OnEntry(() => FireTrigger(Trigger.PlacingBuildingCompleted));
+			.OnEntry(() => AudioManager.Instance.PlaySound(AudioManager.Sound.PlaceBuilding))
+			.OnEntry(() => FireTrigger(Trigger.PlacingBuildingCompleted));
 
-        stateMachiene.Configure(State.GameOver)
+		stateMachiene.Configure(State.GameOver)
 			.Permit(Trigger.RestartLevel, State.Starting);
 
 		stateMachiene.OnTransitioned((transition) => OnTransitioned?.Invoke(transition));

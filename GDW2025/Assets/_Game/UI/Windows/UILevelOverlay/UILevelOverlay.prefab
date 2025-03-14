@@ -296,6 +296,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   drawPileSize: {fileID: 5926465073587854624}
+  pointsText: {fileID: 7892157485790147443}
   cardImage: {fileID: 157552394312969307}
   images:
   - {fileID: 21300000, guid: 2f9d3ee900e77e34abbcab368ae19320, type: 3}
@@ -447,7 +448,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4582787166842953050, guid: c09b0ab32c0fc674db40d0c835c45200, type: 3}
       propertyPath: m_text
-      value: Points
+      value: '[Points]'
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -459,6 +460,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3868934230342041264, guid: c09b0ab32c0fc674db40d0c835c45200, type: 3}
   m_PrefabInstance: {fileID: 5917668127043399209}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7892157485790147443 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4582787166842953050, guid: c09b0ab32c0fc674db40d0c835c45200, type: 3}
+  m_PrefabInstance: {fileID: 5917668127043399209}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &7901103959175200890
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -529,7 +541,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3868934230342041264, guid: c09b0ab32c0fc674db40d0c835c45200, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 65.2
+      value: -90.2
       objectReference: {fileID: 0}
     - target: {fileID: 3868934230342041264, guid: c09b0ab32c0fc674db40d0c835c45200, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -553,11 +565,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4582787166842953050, guid: c09b0ab32c0fc674db40d0c835c45200, type: 3}
       propertyPath: m_text
-      value: 123
+      value: '[C]'
       objectReference: {fileID: 0}
     - target: {fileID: 4582787166842953050, guid: c09b0ab32c0fc674db40d0c835c45200, type: 3}
       propertyPath: m_HorizontalAlignment
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
