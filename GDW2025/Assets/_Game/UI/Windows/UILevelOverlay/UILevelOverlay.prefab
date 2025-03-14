@@ -308,6 +308,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 696715feb2d46db488e2fcd342f70606, type: 3}
   - {fileID: 21300000, guid: 5a7ede289a462664cb03e1dd309a63a7, type: 3}
   - {fileID: 21300000, guid: b68852404e758cb4dbae0f06673bc5ae, type: 3}
+  cardStackSizeWarningThreshold: 3
+  cardStackSizeWarningColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  cardStackSizeLoosColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &5052874455836784361
 MonoBehaviour:
   m_ObjectHideFlags: 0
