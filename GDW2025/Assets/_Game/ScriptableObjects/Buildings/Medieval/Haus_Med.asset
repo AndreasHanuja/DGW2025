@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Haus_Med
   m_EditorClassIdentifier: 
   allowedInputs: 08000000
-  allowedGround: 000000000100000002000000
+  allowedGround: 00000000
   weight: 1
   pointValue: 0
   createdPrefabs:

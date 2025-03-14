@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Metall_Med
   m_EditorClassIdentifier: 
   allowedInputs: 03000000
-  allowedGround: 000000000100000002000000
+  allowedGround: 00000000
   weight: 1
   pointValue: 0
   createdPrefabs:
