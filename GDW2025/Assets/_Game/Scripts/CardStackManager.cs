@@ -46,6 +46,11 @@ public class CardStackManager : SingeltonMonoBehaviour<CardStackManager>
 			DrawCard();
 			GameManager.Instance.FireTrigger(GameManager.Trigger.DrawBuildingCompleted);
 		}
+
+		if (transition.Trigger == GameManager.Trigger.PlaceBuilding)
+		{
+			CurrentCard = 0;
+		}
 	}
 
 	private void DrawCard()
@@ -64,13 +69,6 @@ public class CardStackManager : SingeltonMonoBehaviour<CardStackManager>
 		value = CurrentCard;
         return CurrentCard > 0;
     }
-
-    public bool TryPop(out byte value)
-    {
-		value = CurrentCard;
-		CurrentCard = 0;
-		return CurrentCard > 0;
-	}
 
 	private void AddCardWhenThresholdReched(int points)
 	{
