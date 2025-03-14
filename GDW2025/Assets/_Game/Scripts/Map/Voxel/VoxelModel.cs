@@ -17,26 +17,33 @@ namespace Game.Map.Voxel
         
         public void SetValue(Vector3Int position, int value, bool silent = false)
         {
-            Vector3Int key = GetChunkKey(position);
-            if (!data.ContainsKey(key))
+            lock (dirtyChunks)
             {
-                data[key] = new int[chunkSize * chunkSize * chunkSize];
-            }
-            int keyInChunk = GetKeyInChunk(position - key);
-            data[key][keyInChunk] = value;
+                Vector3Int key = GetChunkKey(position);
+                if (!data.ContainsKey(key))
+                {
+                    data[key] = new int[chunkSize * chunkSize * chunkSize];
+                }
+                int keyInChunk = GetKeyInChunk(position - key);
+                data[key][keyInChunk] = value;
 
-            if(!silent)
-            {
-                OnChunkUpdated?.Invoke(key);
-            }
-            else
-            {
-                dirtyChunks.Add(key);
+                if (!silent)
+                {
+                    OnChunkUpdated?.Invoke(key);
+                }
+                else
+                {
+                    dirtyChunks.Add(key);
+                }
             }
         }
-        public void ClearChunk(Vector3Int chunkKey)
+        public void ClearChunk(Vector3Int chunkKey, bool setDirty = false)
         {
             data.TryRemove(chunkKey, out int[] values);
+            if(setDirty)
+            {
+                dirtyChunks.Add(chunkKey);
+            }
         }
         public int[] GetChunkData(Vector3Int chunkKey)
         {
@@ -48,8 +55,11 @@ namespace Game.Map.Voxel
         }
         public void UpdateDirtyChunks()
         {
-            Parallel.ForEach(dirtyChunks, c => OnChunkUpdated?.Invoke(c));
-            dirtyChunks.Clear();
+            lock (dirtyChunks)
+            {
+                Parallel.ForEach(dirtyChunks, c => OnChunkUpdated?.Invoke(c));
+                dirtyChunks.Clear();
+            }
         }
         public void UpdateChunk(Vector3Int chunkKey)
         {

@@ -65,7 +65,12 @@ namespace Game.Map
 
                 byte[,] groundCache = WFCManager.Instance.GetGroundCache();
                 updatedPositions = updatedPositions.Where(p => groundCache[p.x, p.y] != 3);
-                Parallel.ForEach(updatedPositions, p => VoxelPresenter.Instance.GenerateGroundStructure(targetGround, p));
+
+                //TODO nachbarn neu generieren
+                var tasks = updatedPositions.Select(async p =>
+                {
+                    VoxelPresenter.Instance.GenerateGroundStructure(targetGround, p);
+                }).ToList();
             }
 
             //notify game manager
