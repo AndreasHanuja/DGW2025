@@ -50,7 +50,7 @@ namespace Game.Map
             Parallel.ForEach(outputChange, o => VoxelPresenter.Instance.SetStructure(new Vector3Int(o.position.x * 16, 0, o.position.y * 16), modelListe.prefabs[o.newValue].data));
 
             //transform bioms
-            if (outputChange.Count() > 0 && (currentCard == 6 || currentCard == 7)) 
+            if (outputChange.Count() > 0 && (currentCard == 6 || currentCard == 7))
             {
                 IEnumerable<Vector2Int> updatedPositions = WFCManager.GetNeighbours(Vector2Int.RoundToInt(clickPosition), true);
                 byte targetGround = (byte)(currentCard == 6 ? 2 : 1);
@@ -63,6 +63,8 @@ namespace Game.Map
 
                 outputChange = outputChange.Concat(tmp);
 
+                byte[,] groundCache = WFCManager.Instance.GetGroundCache();
+                updatedPositions = updatedPositions.Where(p => groundCache[p.x, p.y] != 3);
                 Parallel.ForEach(updatedPositions, p => VoxelPresenter.Instance.GenerateGroundStructure(targetGround, p));
             }
 
