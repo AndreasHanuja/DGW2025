@@ -1,13 +1,41 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using static Game.Map.MapInteractionManager;
 using GameManagerTransition = Stateless.StateMachine<GameManager.State, GameManager.Trigger>.Transition;
 
 public class CardStackManager : SingeltonMonoBehaviour<CardStackManager>
 {
+	[Serializable]
+	private class CardSet
+	{
+		[SerializeField]
+		private List<Card> cards;
+		public bool CanPickCard => cards.Count > 0;
+
+		public CardSet(CardSet org)
+		{
+			cards = new List<Card>(org.cards);
+		}
+
+		public Card PickCard()
+		{
+			int i = UnityEngine.Random.Range(0, cards.Count);
+			Card pickedCard = cards[i];
+			cards.RemoveAt(i);
+			return pickedCard;
+		}
+	}
+
+
 	[SerializeField]
 	private int startCardDeckSize = 5;
+	[SerializeField]
+	private List<CardSet> cardSets;
 
+	private CardSet currentCardSet; 
+	private int currentCardSetIndex;
 	private byte currentCard = 0;
 	public byte CurrentCard { get => currentCard; private set { currentCard = value; CurrentCardChanged?.Invoke(currentCard); } }
 	private int cardStackSize = 0;
@@ -39,6 +67,8 @@ public class CardStackManager : SingeltonMonoBehaviour<CardStackManager>
 			CardStackSize = startCardDeckSize;
 			totalAddedCards = 0;
 			nextCardPointTpreshold = CardThresholdFunction(totalAddedCards);
+			currentCardSetIndex = 0;
+			currentCardSet = new CardSet(cardSets[currentCardSetIndex]);
 		}
 
 		if (transition.Destination == GameManager.State.DrawingBuilding)
@@ -61,7 +91,23 @@ public class CardStackManager : SingeltonMonoBehaviour<CardStackManager>
 		}
 
 		CardStackSize--;
-		CurrentCard = (byte)Mathf.Clamp(Random.Range(1, 15), 1, 8);
+		CurrentCard = (byte)PickCard();
+
+		Card PickCard()
+		{
+			if (!currentCardSet.CanPickCard)
+			{
+				currentCardSetIndex++;
+				if (currentCardSetIndex >= cardSets.Count)
+				{
+					//clamp 
+					currentCardSetIndex = cardSets.Count - 1;
+				}
+				currentCardSet = new CardSet(cardSets[currentCardSetIndex]);
+			}
+
+			return currentCardSet.PickCard();
+		}
 	}
 
 	public bool TryPeek(out byte value)
