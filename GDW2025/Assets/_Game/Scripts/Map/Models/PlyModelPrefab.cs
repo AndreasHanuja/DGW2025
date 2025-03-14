@@ -32,7 +32,14 @@ namespace Game.Map.Models
         }
         public void SetData(int x, int y, int z, int value)
         {
-            data[x + z * modelSize + y * modelSize * modelSize] = value;
+            try
+            {
+                data[x + z * modelSize + y * modelSize * modelSize] = value;
+            }
+            catch
+            {
+                Debug.Log("A");
+            }
         }
 
         public PlyModel Instantiate(Vector3Int offset)
