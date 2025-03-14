@@ -64,7 +64,7 @@ public class ModelListe : MonoBehaviour
             for (int y = 0; y < 12; y++)
             {
                 data[x, y] = (byte)Random.Range(0, 1);
-                VoxelPresenter.Instance.GenerateGroundStructure(data[x, y], new Vector2Int(x, y));
+                //VoxelPresenter.Instance.GenerateGroundStructure(data[x, y], new Vector2Int(x, y));
             }
         }
         return data;
