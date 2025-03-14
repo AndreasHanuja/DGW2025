@@ -120,6 +120,11 @@ public class UICanvas : MonoBehaviour, IUICanvasGroupMember
 
 	private void RegisterParentCanvasGroup()
 	{
+		if (transform.parent == null)
+		{
+			return;
+		}
+
 		//GetComponentInParent searches the specified object too, so start searching at transform.parent
 		UICanvasGroup parentGroup = transform.parent.GetComponentInParent<UICanvasGroup>(true);
 		if (parentGroup == null)
