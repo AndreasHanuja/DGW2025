@@ -1,3 +1,4 @@
+using Game.Map.WFC;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -11,7 +12,22 @@ public class Raycast : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        if (GameManager.Instance.IsInState( GameManager.State.MainMenu))
+        {
+            return;
+        }
+        Vector2Int gridPosition = GetGridPosition();
+        gridPosition.x = Mathf.Clamp(gridPosition.x, 0, 12*16);
+        gridPosition.y = Mathf.Clamp(gridPosition.y, 0, 12*16);
+
+        Vector2Int gridPositionLogic = gridPosition/16;
+
+        bool isValid = gridPosition == GetGridPosition() && WFCManager.Instance != null && WFCManager.Instance.GetGroundCache()[gridPositionLogic.x, gridPositionLogic.y] != 3 && WFCManager.Instance.GetInputCache()[gridPositionLogic.x, gridPositionLogic.y] == 0;
+        marker.transform.GetChild(0).gameObject.SetActive(isValid);
+        marker.transform.GetChild(1).gameObject.SetActive(!isValid);
         marker.transform.position = new Vector3(GetGridPosition().x, 0f , GetGridPosition().y);
+
+
         GridClick();
     }
 

@@ -29,6 +29,14 @@ namespace Game.Map.WFC
         {
             return prefabs.ToList();
         }
+        public byte[,] GetGroundCache()
+        {
+            return groundCached;
+        }
+        public byte[,] GetInputCache()
+        {
+            return inputCached;
+        }
         public void WFC_Init(int mapSize, int seed, List<PlyModelPrefab> prefabs, byte[,] groundCache)
         {
             WFCManager.mapSize = mapSize;
@@ -50,6 +58,10 @@ namespace Game.Map.WFC
             }
             foreach (WFCInputChange input in inputs.Where(i => i.Type == ChangeType.Map))
             {
+                if(groundCached[input.position.x, input.position.y] == 3)
+                {
+                    continue;
+                }
                 groundCached[input.position.x, input.position.y] = input.value;
             }
 
@@ -157,7 +169,7 @@ namespace Game.Map.WFC
         }
         private void CollapseBest(List<Vector2Int> uncollapsedPositions, HashSet<short>[,] possibilities, HashSet<Vector2Int> propagatePositions)
         {
-            int index = uncollapsedPositions.IndexOfMinBy(p => possibilities[p.x, p.y].Count);
+            int index = uncollapsedPositions.IndexOfMinBy(p => possibilities[p.x, p.y].Max(p => prefabs[p].weight));
             Vector2Int position = uncollapsedPositions[index];
             uncollapsedPositions.RemoveAt(index);
 

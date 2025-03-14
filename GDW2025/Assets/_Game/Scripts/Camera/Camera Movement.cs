@@ -6,13 +6,6 @@ public class CameraMovement : MonoBehaviour
     [SerializeField] float moveSpeed = 100f;
     [SerializeField] Vector2 minCameraMovePoint = new(0, 0);
     [SerializeField] Vector2 maxCameraMovePoint = new(32, 32);
-    [SerializeField] GameObject collisionLayer;
-
-    public void Start()
-    {
-        collisionLayer.transform.localPosition = new Vector3((maxCameraMovePoint.x + minCameraMovePoint.x) / 2, 0, (maxCameraMovePoint.y + minCameraMovePoint.y) / 2);
-        collisionLayer.transform.localScale = new Vector3(maxCameraMovePoint.x / 10 , 1 , maxCameraMovePoint.y / 10);
-    }
 
     // Der Input des Spielers wird FPS-unabhängig und mit dem Speed multipliziert als Movement ausgegeben.
     public void Update()
