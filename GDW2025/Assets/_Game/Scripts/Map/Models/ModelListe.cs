@@ -19,10 +19,11 @@ public class ModelListe : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
 
-
         foreach (PlyModelSetup setup in models)
-        {
-            setup.LoadModel();
+		{
+#if UNITY_EDITOR
+			setup.LoadModel();
+#endif
             setup.SetHashs();
             for (int i = 0; i < setup.createdPrefabs.Count; i++)
             {
@@ -62,7 +63,7 @@ public class ModelListe : MonoBehaviour
         {
             for (int y = 0; y < 12; y++)
             {
-                data[x, y] = (byte)Random.Range(0, 3);
+                data[x, y] = (byte)Random.Range(0, 1);
                 VoxelPresenter.Instance.GenerateGroundStructure(data[x, y], new Vector2Int(x, y));
             }
         }

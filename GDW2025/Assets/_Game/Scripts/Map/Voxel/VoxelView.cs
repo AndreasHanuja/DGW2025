@@ -2,7 +2,7 @@ using Game.Map.WFC;
 using NUnit.Framework.Internal;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Searcher.SearcherWindow.Alignment;
+// using static UnityEditor.Searcher.SearcherWindow.Alignment;
 
 namespace Game.Map.Voxel
 {
