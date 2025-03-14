@@ -57,16 +57,37 @@ public class ModelListe : MonoBehaviour
     private byte[,] GenerateMap()
     {
         byte[,] data = new byte[12, 12];
+       
+        //unten links
+        data[0, 0] = 3;
+        data[0, 1] = 3;
+        data[1, 0] = 3;
+        data[1, 1] = 3;
 
-        Random.InitState(0);
-        for (int x = 0; x < 12; x++) 
-        {
-            for (int y = 0; y < 12; y++)
-            {
-                data[x, y] = (byte)Random.Range(0, 1);
-                //VoxelPresenter.Instance.GenerateGroundStructure(data[x, y], new Vector2Int(x, y));
-            }
-        }
+        //oben links
+        data[0, 11] = 3;
+
+        //see oben links
+        data[3, 8] = 3;
+
+        //berg
+        data[7, 0] = 3;
+        data[7, 1] = 3;
+        data[8, 0] = 3;
+        data[8, 1] = 3;
+        data[9, 0] = 3;
+        data[9, 1] = 3;
+        data[10, 0] = 3;
+        data[10, 1] = 3;
+        data[10, 2] = 3;
+        data[11, 0] = 3;
+        data[11, 1] = 3;
+        data[11, 2] = 3;
+
+        //see am leuchtturm
+        data[10, 10] = 3;
+        data[10, 9] = 3;
+
         return data;
     }
 }
