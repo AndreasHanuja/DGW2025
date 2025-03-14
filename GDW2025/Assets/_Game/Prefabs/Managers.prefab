@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 974daf0c45381b7459cfb501d2e62d36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  displayState: 0
 --- !u!1 &5783708003006214105
 GameObject:
   m_ObjectHideFlags: 0
@@ -180,7 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94ebf2e0473f1334db6fca966d56f34c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startCardDeckSize: 5
+  startCardDeckSize: 7
 --- !u!1 &8384378816950409688
 GameObject:
   m_ObjectHideFlags: 0

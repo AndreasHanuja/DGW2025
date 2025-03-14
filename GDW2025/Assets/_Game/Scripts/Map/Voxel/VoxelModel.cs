@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Splines;
 
 namespace Game.Map.Voxel
 {
@@ -20,7 +22,7 @@ namespace Game.Map.Voxel
             {
                 data[key] = new int[chunkSize * chunkSize * chunkSize];
             }
-            int keyInChunk = GetKeyInChunk(position);
+            int keyInChunk = GetKeyInChunk(position - key);
             data[key][keyInChunk] = value;
 
             if(!silent)
@@ -46,10 +48,7 @@ namespace Game.Map.Voxel
         }
         public void UpdateDirtyChunks()
         {
-            foreach(Vector3Int chunk in dirtyChunks)
-            {
-                OnChunkUpdated?.Invoke(chunk);
-            }
+            Parallel.ForEach(dirtyChunks, c => OnChunkUpdated?.Invoke(c));
             dirtyChunks.Clear();
         }
         public void UpdateChunk(Vector3Int chunkKey)

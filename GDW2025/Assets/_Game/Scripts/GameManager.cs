@@ -29,9 +29,11 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 		RestartLevel
 	}
 
+	[SerializeField]
+	private bool displayState = false;
+
 	private StateMachine<State, Trigger> stateMachiene;
 	private StateMachine<State, Trigger>.TriggerWithParameters<List<WFCResolvedChange>> placeBuildingTrigger;
-	private bool displayState = false;
 	private bool CanDrawBuilding => CardStackManager.Instance.CanDrawBuilding;
 	public event Action<StateMachine<State, Trigger>.Transition> OnTransitioned;
 
@@ -102,11 +104,5 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 	public bool IsInState(State state)
 	{
 		return stateMachiene.IsInState(state);
-	}
-
-	[ContextMenu("Display State")]
-	private void DosplayState()
-	{
-		displayState = !displayState;
 	}
 }

@@ -12,9 +12,9 @@ namespace Game.Map.Models
     public class PlyModelSetup : ScriptableObject
     {
         [SerializeField] private List<int> allowedInputs;
-        [SerializeField] private List<int> allowedGround;
+		[SerializeField] private List<int> allowedGround;
 
-        [SerializeField] private float weight;
+		[SerializeField] private float weight;
 
 		[SerializeField] private int pointValue = 0;
         public int PointValue => pointValue;
@@ -68,11 +68,14 @@ namespace Game.Map.Models
                     }
                 }
                 int minX = Mathf.RoundToInt(unsortedValues.Min(v => v.x) / 8.0f) * 8;
-                int minY = unsortedValues.Min(v => v.y);
+                int minX2 = unsortedValues.Min(v => v.x);
+				int minY = unsortedValues.Min(v => v.y);
                 int maxY = unsortedValues.Max(v => v.y);
                 int minZ = Mathf.RoundToInt(unsortedValues.Min(v => v.z) / 8.0f) * 8;
+				int minZ2 = unsortedValues.Min(v => v.z);
+                Debug.Log($"xmin = {minX2}, zmin = {minZ2}");
 
-                for(int i= 0; i < createdPrefabs.Count; i++)
+				for (int i= 0; i < createdPrefabs.Count; i++)
                 {
                     createdPrefabs[i].InitHeight(maxY - minY + 1);
                 }

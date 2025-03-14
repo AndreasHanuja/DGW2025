@@ -47,7 +47,7 @@ namespace Game.Map
             Parallel.ForEach(outputChange, o => VoxelPresenter.Instance.SetStructure(new Vector3Int(o.position.x * 16, 0, o.position.y * 16), modelListe.prefabs[o.newValue].data));
 
             //transform bioms
-            if (currentCard == 6 || currentCard == 7) 
+            if (outputChange.Count() > 0 && currentCard == 6 || currentCard == 7) 
             {
                 IEnumerable<Vector2Int> updatedPositions = WFCManager.GetNeighbours(Vector2Int.RoundToInt(clickPosition), true);
                 byte targetGround = (byte)(currentCard == 6 ? 2 : 1);

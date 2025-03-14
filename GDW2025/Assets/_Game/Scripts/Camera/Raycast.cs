@@ -17,6 +17,10 @@ public class Raycast : MonoBehaviour
 
     private Vector2Int GetGridPosition()
     {
+        if (GameManager.Instance.IsInState(GameManager.State.MainMenu))
+        {
+            return Vector2Int.zero;
+        }
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         int colliderLayer = LayerMask.GetMask("Collision");
