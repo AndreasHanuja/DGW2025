@@ -9,21 +9,29 @@ using GameManagerTransition = Stateless.StateMachine<GameManager.State, GameMana
 public class UILevelOverlay : UICanvasGeneric
 {
 	[SerializeField] private TMP_Text drawPileSize;
+	[SerializeField] private TMP_Text pointsText;
 	[SerializeField] private Image cardImage;
 	[SerializeField] private Sprite[] images;
 
 
 	void Start()
 	{
+		PointsManager.Instance.PointsChanged += PointsChangedHandler;
+		PointsChangedHandler(PointsManager.Instance.Points);
 		CardStackManager.Instance.CardStackSizeChanged += CardStackSizeChangedHandler;
+		CardStackSizeChangedHandler(CardStackManager.Instance.CardStackSize);
 		CardStackManager.Instance.CurrentCardChanged += CurrentCardChangedHandler;
-		CardStackManager.Instance.TryPeek(out byte value);
-		CurrentCardChangedHandler(value);
+		CurrentCardChangedHandler(CardStackManager.Instance.CurrentCard);
+	}
+
+	private void PointsChangedHandler(int points)
+	{
+		pointsText.text = $"{points}";
 	}
 
 	private void CardStackSizeChangedHandler(int cardStackSize)
 	{
-		drawPileSize.text = $"+{cardStackSize}";
+		drawPileSize.text = $"{cardStackSize}";
 	}
 
 	private void CurrentCardChangedHandler(byte card)

@@ -33,10 +33,15 @@ public class PointsManager : SingeltonMonoBehaviour<PointsManager>
 
 	private void OnPlaciedBuilding(List<WFCResolvedChange> changes)
 	{
+		List<PlyModelSetup> lostBuildings = changes.Select(change => change.oldValue).ToList();
+		List<PlyModelSetup> gainedBuildings = changes.Select(change => change.newValue).ToList();
+
 		int lostPoints = GetPoints(changes.Select(change => change.oldValue).ToList());
 		int gainedPoints = GetPoints(changes.Select(change => change.newValue).ToList());
 
 		int pointDelta = gainedPoints - lostPoints;
+		//Debug.Log($"lost: {lostPoints}, gained: {gainedPoints}, delta: {pointDelta}\nlost: {string.Join(", ", lostBuildings)}\ngained: {string.Join(", ", gainedBuildings)}");
+
 		Points += pointDelta;
 	}
 
@@ -47,7 +52,7 @@ public class PointsManager : SingeltonMonoBehaviour<PointsManager>
 		foreach (PlyModelSetup building in buildings)
 		{
 			if(building == null) continue;
-			Points += building.PointValue;
+			points += building.PointValue;
 		}
 
 		return points;
