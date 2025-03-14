@@ -169,7 +169,7 @@ namespace Game.Map.WFC
         }
         private void CollapseBest(List<Vector2Int> uncollapsedPositions, HashSet<short>[,] possibilities, HashSet<Vector2Int> propagatePositions)
         {
-            int index = uncollapsedPositions.IndexOfMinBy(p => possibilities[p.x, p.y].Count);
+            int index = uncollapsedPositions.IndexOfMinBy(p => possibilities[p.x, p.y].Max(p => prefabs[p].weight));
             Vector2Int position = uncollapsedPositions[index];
             uncollapsedPositions.RemoveAt(index);
 

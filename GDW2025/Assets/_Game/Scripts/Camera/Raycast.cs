@@ -22,7 +22,7 @@ public class Raycast : MonoBehaviour
 
         Vector2Int gridPositionLogic = gridPosition/16;
 
-        bool isValid = gridPosition == GetGridPosition() && WFCManager.Instance.GetGroundCache()[gridPositionLogic.x, gridPositionLogic.y] != 3 && WFCManager.Instance.GetInputCache()[gridPositionLogic.x, gridPositionLogic.y] == 0;
+        bool isValid = gridPosition == GetGridPosition() && WFCManager.Instance != null && WFCManager.Instance.GetGroundCache()[gridPositionLogic.x, gridPositionLogic.y] != 3 && WFCManager.Instance.GetInputCache()[gridPositionLogic.x, gridPositionLogic.y] == 0;
         marker.transform.GetChild(0).gameObject.SetActive(isValid);
         marker.transform.GetChild(1).gameObject.SetActive(!isValid);
         marker.transform.position = new Vector3(GetGridPosition().x, 0f , GetGridPosition().y);
