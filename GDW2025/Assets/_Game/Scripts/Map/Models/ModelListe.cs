@@ -19,7 +19,7 @@ public class ModelListe : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
 
-
+#if UNITY_EDITOR
         foreach (PlyModelSetup setup in models)
         {
             setup.LoadModel();
@@ -29,7 +29,7 @@ public class ModelListe : MonoBehaviour
                 prefabs.Add(setup.createdPrefabs[i]);
             }
         }
-
+#endif
         prefabs.OrderBy(p => -p.weight);
 
         for(int i =0; i < prefabs.Count; i++)
