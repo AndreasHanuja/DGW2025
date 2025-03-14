@@ -73,7 +73,7 @@ namespace Game.Map.Models
                 int maxY = unsortedValues.Max(v => v.y);
                 int minZ = Mathf.RoundToInt(unsortedValues.Min(v => v.z) / 8.0f) * 8;
 				int minZ2 = unsortedValues.Min(v => v.z);
-                Debug.Log($"xmin = {minX2}, zmin = {minZ2}");
+                //Debug.Log($"xmin = {minX2}, zmin = {minZ2}");
 
 				for (int i= 0; i < createdPrefabs.Count; i++)
                 {

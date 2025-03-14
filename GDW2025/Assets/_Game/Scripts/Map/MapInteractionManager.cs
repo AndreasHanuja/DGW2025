@@ -67,8 +67,11 @@ namespace Game.Map
             if (outputChange.Count() > 0)
             {
                 List<PlyModelPrefab> prefabs = WFCManager.Instance.GetPrefabs();
-                GameManager.Instance.PlacedBuilding(
-                    outputChange.Select(o => {
+
+                List<WFCOutputChange> currentoutputChange = outputChange.Where(o => o.oldValue != o.newValue).ToList();
+				GameManager.Instance.PlacedBuilding(
+					currentoutputChange
+					.Select(o => {
                         return new WFCResolvedChange { 
                             position = o.position,  
                             newValue = o.newValue == -1 ? null : prefabs[o.newValue].setup, 
