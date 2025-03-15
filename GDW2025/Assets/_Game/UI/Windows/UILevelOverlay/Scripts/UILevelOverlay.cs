@@ -33,7 +33,22 @@ public class UILevelOverlay : UICanvasGeneric
 		cardStackSizeDefaultColor = drawPileSize.color;
 	}
 
-	void Start()
+    private void Update()
+    {
+        switch (Raycast.dirtyBackgroundImageReference)
+        {
+            case 0:
+                cardImageBack.sprite = imagesBackMedival;
+                break;
+            case 1:
+                cardImageBack.sprite = imagesBackSolar;
+                break;
+            case 2:
+                cardImageBack.sprite = imagesBackFantasy;
+                break;
+        }
+    }
+    void Start()
 	{
 		gameOverPannel.SetActive(false);
 		GameManager.Instance.OnTransitioned += OnGameManagerTransition;
@@ -88,20 +103,7 @@ public class UILevelOverlay : UICanvasGeneric
 	private void CurrentCardChangedHandler(byte card)
 	{
 		cardNameText.text = buildingNames[card];
-		cardImage.sprite = images[card];
-
-		switch (Raycast.dirtyBackgroundImageReference)
-		{
-			case 0:
-				cardImageBack.sprite = imagesBackMedival;
-				break;
-			case 1:
-				cardImageBack.sprite = imagesBackSolar;
-				break;
-			case 2:
-				cardImageBack.sprite = imagesBackFantasy;
-				break;
-		}
+		cardImage.sprite = images[card];		
 		UpdateBar();
 	}
 
