@@ -42,7 +42,7 @@ public class Raycast : MonoBehaviour
         marker.transform.GetChild(1).gameObject.SetActive(!isValid);
         marker.transform.position = new Vector3(GetGridPosition().x, 0f , GetGridPosition().y);
 
-        if(gridPosition == GetGridPosition())
+        if(gridPosition == GetGridPosition() && WFCManager.Instance != null && WFCManager.Instance.GetGroundCache() != null)
         {
             byte hoverBiom = WFCManager.Instance.GetGroundCache()[gridPositionLogic.x, gridPositionLogic.y];
             dirtyBackgroundImageReference = hoverBiom;
