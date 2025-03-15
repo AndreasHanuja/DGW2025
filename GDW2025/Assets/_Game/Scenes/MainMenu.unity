@@ -802,6 +802,18 @@ PrefabInstance:
       propertyPath: raycast
       value: 
       objectReference: {fileID: 531110903}
+    - target: {fileID: 6470454337940934599, guid: 5d0cbae9deae17e448b3b3dfddebfa39, type: 3}
+      propertyPath: models.Array.size
+      value: 47
+      objectReference: {fileID: 0}
+    - target: {fileID: 6470454337940934599, guid: 5d0cbae9deae17e448b3b3dfddebfa39, type: 3}
+      propertyPath: 'models.Array.data[45]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 8c81ddf9a58061445ae77ee56fc5546c, type: 2}
+    - target: {fileID: 6470454337940934599, guid: 5d0cbae9deae17e448b3b3dfddebfa39, type: 3}
+      propertyPath: 'models.Array.data[46]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 5a9922ebdfdbfbc42b75adba2d105650, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
