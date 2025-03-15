@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using GameManagerTransition = Stateless.StateMachine<GameManager.State, GameManager.Trigger>.Transition;
 
@@ -14,6 +15,7 @@ public class UILevelOverlay : UICanvasGeneric
 	[SerializeField] private Image cardImage;
 	[SerializeField] private Image cardImageBack;
 	[SerializeField] private Image cardStackBarFillImage;
+	[SerializeField] private GameObject gameOverPannel;
 	[SerializeField] private Sprite[] images;
 	[SerializeField] private Sprite imagesBackMedival;
 	[SerializeField] private Sprite imagesBackSolar;
@@ -31,6 +33,7 @@ public class UILevelOverlay : UICanvasGeneric
 
 	void Start()
 	{
+		gameOverPannel.SetActive(false);
 		GameManager.Instance.OnTransitioned += OnGameManagerTransition;
 		PointsManager.Instance.PointsChanged += PointsChangedHandler;
 		PointsChangedHandler(PointsManager.Instance.Points);
@@ -39,6 +42,11 @@ public class UILevelOverlay : UICanvasGeneric
 		CardStackManager.Instance.CurrentCardChanged += CurrentCardChangedHandler;
 		CurrentCardChangedHandler(CardStackManager.Instance.CurrentCard);
 		CardStackManager.Instance.AddedCardToStack += PunchCardStackSizeText;
+	}
+
+	public void Restert()
+	{
+		SceneManager.LoadScene(0);
 	}
 
 	private void OnGameManagerTransition(GameManagerTransition transition)
@@ -51,6 +59,8 @@ public class UILevelOverlay : UICanvasGeneric
 		{
 			drawPileSize.color = cardStackSizeDefaultColor;
 		}
+
+		gameOverPannel.SetActive(transition.Destination == GameManager.State.GameOver);
 	}
 
 	private void PointsChangedHandler(int points)
