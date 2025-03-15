@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.VFX;
+using static Unity.Burst.Intrinsics.X86.Avx;
 
 namespace Game.Map
 {
@@ -47,7 +48,11 @@ namespace Game.Map
 
             outputChange = outputChange.Where(o => o.oldValue != -1 || o.newValue != prefabs.Last().id);
             //render new models
-            Parallel.ForEach(outputChange, o => VoxelPresenter.Instance.SetStructure(new Vector3Int(o.position.x * 16, 0, o.position.y * 16), modelListe.prefabs[o.newValue].data));
+
+            var buildingTasks1 = outputChange.Select(async o =>
+            {
+                VoxelPresenter.Instance.AnimateStructure(new Vector3Int(o.position.x * 16, 0, o.position.y * 16), modelListe.prefabs[o.newValue].data, true, true);
+            }).ToList();
 
             //transform bioms
             if (outputChange.Count() > 0 && (currentCard == 6 || currentCard == 7))
@@ -59,15 +64,21 @@ namespace Game.Map
                     updatedPositions.Select(p =>
                       new WFCInputChange() { position = p, Type = ChangeType.Map, value = targetGround }
                   ).ToList());
-                Parallel.ForEach(tmp, o => VoxelPresenter.Instance.SetStructure(new Vector3Int(o.position.x * 16, 0, o.position.y * 16), modelListe.prefabs[o.newValue].data));
+
+                var buildingTasks2 = tmp.Select(async o =>
+                {
+                    VoxelPresenter.Instance.AnimateStructure(new Vector3Int(o.position.x * 16, 0, o.position.y * 16), modelListe.prefabs[o.newValue].data, true, true);
+                }).ToList();
 
                 outputChange = outputChange.Concat(tmp);
 
                 byte[,] groundCache = WFCManager.Instance.GetGroundCache();
                 updatedPositions = updatedPositions.Where(p => groundCache[p.x, p.y] != 3);
 
-                //TODO nachbarn neu generieren
-                var tasks = updatedPositions.Select(async p =>
+                HashSet<Vector2Int> positions = updatedPositions.ToHashSet();
+                positions.ToList().ForEach(p => positions.UnionWith(WFCManager.GetNeighbours(p).Where(n => groundCache[n.x, n.y] == targetGround).ToHashSet()));
+
+                var groundTasks = positions.Select(async p =>
                 {
                     VoxelPresenter.Instance.GenerateGroundStructure(targetGround, p);
                 }).ToList();

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Splines;
 
 namespace Game.Map.Voxel
@@ -53,6 +54,13 @@ namespace Game.Map.Voxel
             }
             return data[chunkKey];
         }
+        public void SetChunkDirty(Vector3Int chunkKey)
+        {
+            lock(dirtyChunks)
+            {
+                dirtyChunks.Add(chunkKey);
+            }
+        }
         public void UpdateDirtyChunks()
         {
             lock (dirtyChunks)
@@ -76,13 +84,13 @@ namespace Game.Map.Voxel
             return data[key][keyInChunk];
         }
 
-        private Vector3Int GetChunkKey(Vector3Int position)
+        public static Vector3Int GetChunkKey(Vector3Int position)
         {
             return new Vector3Int(Mathf.FloorToInt(position.x / (float)chunkSize) * chunkSize,
                 Mathf.FloorToInt(position.y / (float)chunkSize) * chunkSize, 
                 Mathf.FloorToInt(position.z / (float)chunkSize) * chunkSize);
         }
-        private int GetKeyInChunk(Vector3Int position)
+        public static int GetKeyInChunk(Vector3Int position)
         {
             return (position.x % chunkSize) + (position.z % chunkSize) * chunkSize + (position.y % chunkSize) * chunkSize * chunkSize;
         }

@@ -4,6 +4,7 @@ using Game.Map.WFC;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -74,38 +75,80 @@ namespace Game.Map.Voxel
                 model.UpdateChunk(chunkKeyTmp);
             }
         }
-        public async void AnimateStructure(Vector3Int position, int[,,] values, float duration)
+
+        public async void AnimateStructure(Vector3Int position, int[] values, bool ordered, bool clearAbove)
         {
-            List<(Vector3Int, int)> filteredValues = new();
-            for(int x = 0; x < values.GetLength(0); x++)
+            Vector3Int chunkKey = VoxelModel.GetChunkKey(position);
+            int positionIndex = VoxelModel.GetKeyInChunk(position - chunkKey);
+
+            if (clearAbove)
             {
-                for (int z = 0; z < values.GetLength(2); z++)
+                model.ClearChunk(chunkKey + new Vector3Int(0, 16, 0), true);
+            }
+
+            if (values.Length + positionIndex <= 4096)
+            {
+                await AnimateSubStructure(position, values, ordered);
+                return;
+            }
+
+            int part1 = 4096 - positionIndex;
+            int[] part1Array = new int[part1];
+            Array.Copy(values, 0, part1Array, 0, part1);
+            await AnimateSubStructure(position, part1Array, ordered);
+
+            int part2 = values.Length - part1;
+            int[] part2Array = new int[part2];
+            Array.Copy(values, part1, part2Array, 0, part2);
+
+            await AnimateSubStructure(chunkKey + new Vector3Int(0, 16, 0), part2Array, ordered);
+        }
+        public async Task AnimateSubStructure(Vector3Int position, int[] values, bool ordered)
+        {
+            List<(int, int)> filteredValues = new();
+            Vector3Int chunkKey = VoxelModel.GetChunkKey(position);
+            int positionIndex = VoxelModel.GetKeyInChunk(position - chunkKey);
+            int realCount = 0;
+            for (int i = values.Length - 1; i >= 0; i--) 
+            {
+                if (values[i] != 0)
                 {
-                    for (int y = 0; y < values.GetLength(1); y++)
-                    {
-                        if (values[x,y,z] != 0)
-                        {
-                            filteredValues.Add((new Vector3Int(x, y, z), values[x, y, z]));
-                        }
-                    }
+                    realCount++;
                 }
+                filteredValues.Add((positionIndex + i, values[i]));
             }
 
             System.Random random = new System.Random();
             int workerID = random.Next();
+            int index;
             workers[workerID] = 0;
+            model.SetValue(position, 0, silent: true);
+
+            int[] data = model.GetChunkData(chunkKey);
+
+            int skip = 0;
+            int skipCount = realCount / 25;
             while (filteredValues.Count > 0)
             {
-                int index = random.Next(filteredValues.Count - 1);
-                (Vector3Int, int) t = filteredValues[index];
+                index = ordered ? filteredValues.Count - 1 : random.Next(filteredValues.Count - 1);
+                (int, int) t = filteredValues[index];
                 filteredValues.RemoveAt(index);
-                model.SetValue(position + new Vector3Int(t.Item1.x, t.Item1.y, t.Item1.z), t.Item2, silent: true);
-                if(filteredValues.Count % 4 == 0)
+                data[t.Item1] = t.Item2;
+                model.SetChunkDirty(chunkKey);
+
+                if(t.Item2 != 0)
+                {
+                    skip++;
+                }
+                if(skip >= skipCount)
                 {
                     await Task.Delay(1);
+                    skip = 0;
                 }
             }
-            UpdateDirtyChunks();
+            model.ClearChunk(chunkKey);
+            Array.Copy(values, positionIndex, model.GetChunkData(chunkKey), 0, values.Length);
+            model.UpdateChunk(chunkKey);
             workers.Remove(workerID, out int _);
 
         }
@@ -117,38 +160,36 @@ namespace Game.Map.Voxel
 
         public void GenerateGroundStructure(byte type, Vector2Int gridPosition) 
         {
-            int[,,] values = new int[16, 1, 16];
-            if(type == 1)
-            {
-                byte[,] groundCache = WFCManager.Instance.GetGroundCache();
-                bool northFree = gridPosition.y == 11 || groundCache[gridPosition.x, gridPosition.y + 1] != 1;
-                bool eastFree = gridPosition.x == 11 || groundCache[gridPosition.x + 1, gridPosition.y] != 1;
-                bool southFree = gridPosition.y == 0 || groundCache[gridPosition.x, gridPosition.y - 1] != 1;
-                bool westFree = gridPosition.x == 0 || groundCache[gridPosition.x - 1, gridPosition.y] != 1;
+            System.Random random = new System.Random();
 
-                for (int x = 0; x < 16; x++)
-                {
-                    for (int z = 0; z < 16; z++)
-                    {
-                        values[x, 0, z] = GetSolarColor(northFree, eastFree, southFree, westFree, x, z);
-                    }
-                }
-                byte[,] inputCache = WFCManager.Instance.GetInputCache();
-                if (inputCache[gridPosition.x,gridPosition.y] == 0)
-                {
-                    model.ClearChunk(new Vector3Int(gridPosition.x * 16, 0, gridPosition.y * 16), true);
-                }
-                AnimateStructure(new Vector3Int(gridPosition.x * 16, -1, gridPosition.y * 16), values, 2);
-                return;
-            }
-            int[] ints = new int[4096];
-            int color = GroundToColor(type);
+            int[] values = new int[256];
+            byte[,] groundCache = WFCManager.Instance.GetGroundCache();
+
+            bool northFree = gridPosition.y == 11 || groundCache[gridPosition.x, gridPosition.y + 1] != type;
+            bool eastFree = gridPosition.x == 11 || groundCache[gridPosition.x + 1, gridPosition.y] != type;
+            bool southFree = gridPosition.y == 0 || groundCache[gridPosition.x, gridPosition.y - 1] != type;
+            bool westFree = gridPosition.x == 0 || groundCache[gridPosition.x - 1, gridPosition.y] != type;
 
             for (int i = 0; i < 256; i++)
             {
-                ints[3840 + i] = color;
+                switch (type)
+                {
+                    case 1:
+                        values[i] = GetSolarColor(northFree, eastFree, southFree, westFree, i % 16, i / 16);
+                        break;
+                    case 2:
+                        values[i] = GetFantasyColor(northFree, eastFree, southFree, westFree, i % 16, i / 16, random);
+                        break;
+                }
             }
-            SetStructure(new Vector3Int(gridPosition.x * 16, -16, gridPosition.y * 16), ints, false);
+
+            byte[,] inputCache = WFCManager.Instance.GetInputCache();
+            if (inputCache[gridPosition.x, gridPosition.y] == 0)
+            {
+                model.ClearChunk(new Vector3Int(gridPosition.x * 16, 0, gridPosition.y * 16), true);
+            }
+
+            AnimateStructure(new Vector3Int(gridPosition.x * 16, -1, gridPosition.y * 16), values, type == 1, false);
         }
         private int GetSolarColor(bool northFree, bool eastFree, bool southFree, bool westFree, int x, int y)
         {
@@ -185,6 +226,34 @@ namespace Game.Map.Voxel
                 return (197 << 24) + (200 << 16) + (189 << 8) + 255; //grau
             }
             return (211 << 24) + (223 << 16) + (229 << 8) + 255; //weiß
+        }
+        private int GetFantasyColor(bool northFree, bool eastFree, bool southFree, bool westFree, int x, int y, System.Random random)
+        {
+            if (northFree && y > 12)
+            {
+                return random.Next(100) < 60 + (y - 15) * 10 ? 
+                    (173 << 24) + (129 << 16) + (178 << 8) + 255 :
+                    (114 << 24) + (161 << 16) + (82 << 8) + 255; 
+            }
+            if (eastFree && x > 12)
+            {
+                return random.Next(100) < 60 + (x - 15) * 10 ?
+                   (173 << 24) + (129 << 16) + (178 << 8) + 255 :
+                    (114 << 24) + (161 << 16) + (82 << 8) + 255;
+            }
+            if (southFree && y < 3)
+            {
+                return random.Next(100) < 60 + y * 10 ?
+                   (173 << 24) + (129 << 16) + (178 << 8) + 255 :
+                    (114 << 24) + (161 << 16) + (82 << 8) + 255;
+            }
+            if (westFree && x < 3)
+            {
+                return random.Next(100) < 60 + x * 10 ?
+                   (173 << 24) + (129 << 16) + (178 << 8) + 255 :
+                    (114 << 24) + (161 << 16) + (82 << 8) + 255;
+            }
+            return (173 << 24) + (129 << 16) + (178 << 8) + 255;
         }
         private int GroundToColor(byte ground)
         {
