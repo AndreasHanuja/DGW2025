@@ -16,6 +16,8 @@ public class Raycast : MonoBehaviour
     [SerializeField] public TMP_Text text;
     [SerializeField] public Transform signTransform;
 
+    public static int dirtyBackgroundImageReference;
+
     private Vector2Int lastGridPositionLogic = Vector2Int.zero;
     // Update is called once per frame
     private void Update()
@@ -43,7 +45,7 @@ public class Raycast : MonoBehaviour
         if(isValid )
         {
             byte hoverBiom = WFCManager.Instance.GetGroundCache()[gridPositionLogic.x, gridPositionLogic.y];
-            //TODO UPDATE BIOM CARD
+            dirtyBackgroundImageReference = hoverBiom;
         }
         if (lastGridPositionLogic != gridPositionLogic && gridPosition == GetGridPosition())
         {
@@ -60,15 +62,20 @@ public class Raycast : MonoBehaviour
     Tween jumpTween;
     private void UpdateHoverGridPosition(Vector2Int gridPosition)
     {
+        if(WFCManager.Instance == null || WFCManager.Instance.GetOutputCache() == null)
+        {
+            return;
+        }
         short hoverOutput = WFCManager.Instance.GetOutputCache()[gridPosition.x, gridPosition.y];
         List<PlyModelPrefab> prefabs = WFCManager.Instance.GetPrefabs();
 
         bool isActive = hoverOutput != -1 && hoverOutput != prefabs.Count - 1;
         signTransform.gameObject.SetActive(isActive);
 
-        text.text = prefabs[hoverOutput].setup.displayText;
         if (isActive)
         {
+            text.text = prefabs[hoverOutput].setup.displayText;
+
             jumpTween?.Kill();
             signTransform.localPosition = Vector3.zero;
             Sequence s = DOTween.Sequence();

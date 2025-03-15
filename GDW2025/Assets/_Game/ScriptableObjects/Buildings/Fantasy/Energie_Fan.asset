@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Energie_Fan
   m_EditorClassIdentifier: 
   displayText: Kristallformation
-  allowedInputs: 06000000
+  allowedInputs: 07000000
   allowedGround: 000000000100000002000000
   weight: 100
   pointValue: 3

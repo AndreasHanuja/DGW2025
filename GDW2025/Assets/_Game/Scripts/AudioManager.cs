@@ -11,7 +11,7 @@ public class AudioManager : SingeltonMonoBehaviour<AudioManager>
 
 
     [SerializeField]
-    private AudioSource[] AudioSources;
+    private AudioManagerAudioSource[] AudioSources;
 
 
 	public void PlaySound(Sound sound)

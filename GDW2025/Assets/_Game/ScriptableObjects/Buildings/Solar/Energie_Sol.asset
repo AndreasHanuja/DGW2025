@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Energie_Sol
   m_EditorClassIdentifier: 
   displayText: Solarzelle
-  allowedInputs: 07000000
+  allowedInputs: 06000000
   allowedGround: 000000000100000002000000
   weight: 100
   pointValue: 33

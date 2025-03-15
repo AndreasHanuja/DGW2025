@@ -57,8 +57,16 @@ namespace Game.Map
             //transform bioms
             if (outputChange.Count() > 0 && (currentCard == 6 || currentCard == 7))
             {
+                if(currentCard == 7)
+                {
+                    AudioManager.Instance.PlaySound(AudioManager.Sound.SpreadFantasy);
+                }
+                if (currentCard == 6)
+                {
+                    AudioManager.Instance.PlaySound(AudioManager.Sound.SpreadSolar);
+                }
                 IEnumerable<Vector2Int> updatedPositions = WFCManager.GetNeighbours(Vector2Int.RoundToInt(clickPosition), true);
-                byte targetGround = (byte)(currentCard == 6 ? 2 : 1);
+                byte targetGround = (byte)(currentCard == 7 ? 2 : 1);
 
                 IEnumerable<WFCOutputChange> tmp = WFCManager.Instance.WFC_Iterate(
                     updatedPositions.Select(p =>
