@@ -53,7 +53,11 @@ namespace Game.Map.WFC
         }
         public IEnumerable<WFCOutputChange> WFC_Iterate(IEnumerable<WFCInputChange> inputs)
         {
-            if(inputs.Any(i => i.Type == ChangeType.Input && inputCached[i.position.x, i.position.y] != 0)){
+            if(inputs.Any(i => i.position.x < 0 || i.position.x>11 || i.position.y <0 || i.position.y > 11))
+            {
+                return new List<WFCOutputChange>();
+            }
+            if (inputs.Any(i => i.Type == ChangeType.Input && inputCached[i.position.x, i.position.y] != 0)){
                 return new List<WFCOutputChange>();
             }
 
