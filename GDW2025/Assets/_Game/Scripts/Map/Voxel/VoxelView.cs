@@ -102,22 +102,54 @@ namespace Game.Map.Voxel
 
                         int addedVertices = vertices.Count - vertexCount;
 
-                        uint chunkValue = (uint)chunkData[position.x +
+                        int dataRaw = chunkData[position.x +
                            position.z * VoxelModel.chunkSize +
                            position.y * VoxelModel.chunkSize * VoxelModel.chunkSize];
+                        uint chunkValue = (uint)dataRaw;
                         Color voxelColor = new Color(
                              (chunkValue >> 24) / 255f,
                              ((chunkValue >> 16) & 255) / 255f,
                              ((chunkValue >> 8) & 255) / 255f,
                              (chunkValue & 255) / 255f
                         );
+                        float originalAlpha = voxelColor.a;
                         Color.RGBToHSV(voxelColor, out float h, out float s, out float v);
                         Vector3Int pos = chunkKey + position;
                         System.Random random = new System.Random(GetCombinedHash(pos.x, pos.y, pos.z));
                         v = Mathf.Clamp01(random.Next((int)((v - randomColorRange) * 100), (int)((v + randomColorRange) * 100)) / 100f);
                         voxelColor = Color.HSVToRGB(h, s, v);
 
-                        for(int i = 0; i<addedVertices; i++)
+                        switch (dataRaw)
+                        {
+                            case ((255<<24) +(255<<16) + (0<<8) + 255): //fackel
+                                voxelColor.a = 0.5f;
+                                break;
+                            case ((236 << 24) + (245 << 16) + (246 << 8) + 255): //Pilz blau
+                                voxelColor.r = 0f;
+                                voxelColor.g = 0f;
+                                voxelColor.b = 1;
+                                voxelColor.a = 0.5f;
+                                break;
+                            case ((246 << 24) + (236 << 16) + (244 << 8) + 255): //Pilz rot
+                                voxelColor.r = 1f;
+                                voxelColor.g = 0f;
+                                voxelColor.b = 0.5f;
+                                voxelColor.a = 0.5f;
+                                break;
+                            case ((255 << 24) + (123 << 16) + (0 << 8) + 255): //lava
+                                voxelColor.a = 1f;
+                                break;
+                            case ((157 << 24) + (255 << 16) + (76 << 8) + 255): //Solarpunk 
+                                voxelColor.r = 0.1f;
+                                voxelColor.g = 1f;
+                                voxelColor.b = 0.2f;
+                                voxelColor.a = 1f;
+                                break;
+                            default:
+                                voxelColor.a = 0;
+                                break;
+                        }
+                        for (int i = 0; i<addedVertices; i++)
                         {
                             colors.Add(voxelColor);
                         }
