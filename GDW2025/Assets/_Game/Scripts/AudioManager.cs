@@ -4,7 +4,9 @@ public class AudioManager : SingeltonMonoBehaviour<AudioManager>
 {
     public enum Sound
     {
-        PlaceBuilding = 0
+        PlaceBuilding = 0,
+        SpreadSolar = 1,
+        SpreadFantasy = 2
     }
 
 
