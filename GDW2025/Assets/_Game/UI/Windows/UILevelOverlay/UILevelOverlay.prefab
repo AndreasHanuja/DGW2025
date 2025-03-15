@@ -1100,7 +1100,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: d3917daeb6bfcb2448a6bbf9d062aec7, type: 3}
   - {fileID: 0}
   - {fileID: 21300000, guid: f8b610ec5649bb343a5107053335727e, type: 3}
-  - {fileID: 21300000, guid: f8b610ec5649bb343a5107053335727e, type: 3}
+  - {fileID: 21300000, guid: b154de974aa97d341a2c74e4b215352b, type: 3}
   - {fileID: 21300000, guid: 8e70895b8bde742428819e8bff8f9f3b, type: 3}
   buildingNames:
   - 
