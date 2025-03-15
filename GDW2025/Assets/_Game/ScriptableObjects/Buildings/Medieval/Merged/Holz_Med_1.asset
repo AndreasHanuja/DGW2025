@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   allowedInputs: 01000000
   allowedGround: 00000000
-  weight: 10
+  weight: 100
   pointValue: 8
   createdPrefabs:
   - height: 16
@@ -22,7 +22,7 @@ MonoBehaviour:
     setup: {fileID: 11400000}
     allowedInputs: 01000000
     allowedGround: 00000000
-    weight: 10
+    weight: 100
     id: 68
     hashes:
     - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -34,7 +34,7 @@ MonoBehaviour:
     setup: {fileID: 11400000}
     allowedInputs: 01000000
     allowedGround: 00000000
-    weight: 10
+    weight: 100
     id: 69
     hashes:
     - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -46,7 +46,7 @@ MonoBehaviour:
     setup: {fileID: 11400000}
     allowedInputs: 01000000
     allowedGround: 00000000
-    weight: 10
+    weight: 100
     id: 70
     hashes:
     - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -58,7 +58,7 @@ MonoBehaviour:
     setup: {fileID: 11400000}
     allowedInputs: 01000000
     allowedGround: 00000000
-    weight: 10
+    weight: 100
     id: 71
     hashes:
     - 3c61991836e20a63278cc25fa9dabec53253f853aefc2127295f699a3a0c714b
