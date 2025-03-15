@@ -40,12 +40,15 @@ public class CardStackManager : SingeltonMonoBehaviour<CardStackManager>
 	public byte CurrentCard { get => currentCard; private set { currentCard = value; CurrentCardChanged?.Invoke(currentCard); } }
 	private int cardStackSize = 0;
 	public int CardStackSize { get => cardStackSize; private set { cardStackSize = value; CardStackSizeChanged?.Invoke(cardStackSize); } }
-	private int nextCardPointTpreshold = 0;
+	private int lastCardPointThreshold = 0;
+	private int nextCardPointThreshold = 0;
+	public float NextCardPercentage => Mathf.Clamp(Mathf.InverseLerp(lastCardPointThreshold, nextCardPointThreshold, PointsManager.Instance.Points), 0.0f, 1.0f);
 	private int totalAddedCards = 0;
 
 	public bool CanDrawBuilding => CardStackSize > 0;
 	public event System.Action<int> CardStackSizeChanged;
 	public event System.Action<byte> CurrentCardChanged;
+	public event System.Action AddedCardToStack;
 
 	private void Start()
 	{
@@ -66,7 +69,8 @@ public class CardStackManager : SingeltonMonoBehaviour<CardStackManager>
 			CurrentCard = 0;
 			CardStackSize = startCardDeckSize;
 			totalAddedCards = 0;
-			nextCardPointTpreshold = CardThresholdFunction(totalAddedCards);
+			lastCardPointThreshold = 0;
+			nextCardPointThreshold = CardThresholdFunction(totalAddedCards);
 			currentCardSetIndex = 0;
 			currentCardSet = new CardSet(cardSets[currentCardSetIndex]);
 		}
@@ -118,14 +122,16 @@ public class CardStackManager : SingeltonMonoBehaviour<CardStackManager>
 
 	private void AddCardWhenThresholdReched(int points)
 	{
-		if (points < nextCardPointTpreshold)
+		if (points < nextCardPointThreshold)
 		{
 			return;
 		}
 
 		CardStackSize++;
 		totalAddedCards++;
-		nextCardPointTpreshold += CardThresholdFunction(totalAddedCards);
+		lastCardPointThreshold = nextCardPointThreshold;
+		nextCardPointThreshold += CardThresholdFunction(totalAddedCards);
+		AddedCardToStack.Invoke();
 	}
 
 	private int CardThresholdFunction(int i)

@@ -11,6 +11,7 @@ namespace Game.Map.Models
     [CreateAssetMenu(fileName = "PlyModel", menuName = "ScriptableObjects/PlyModel", order = 1)]
     public class PlyModelSetup : ScriptableObject
     {
+        public string displayText;
         [SerializeField] private List<int> allowedInputs;
 		[SerializeField] private List<int> allowedGround;
 
