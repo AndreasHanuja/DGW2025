@@ -147,7 +147,7 @@ namespace Game.Map.Voxel
                 }
             }
             model.ClearChunk(chunkKey);
-            Array.Copy(values, positionIndex, model.GetChunkData(chunkKey), 0, values.Length);
+            Array.Copy(values, 0, model.GetChunkData(chunkKey), positionIndex, values.Length);
             model.UpdateChunk(chunkKey);
             workers.Remove(workerID, out int _);
 

@@ -125,11 +125,11 @@ public class CardStackManager : SingeltonMonoBehaviour<CardStackManager>
 
 		CardStackSize++;
 		totalAddedCards++;
-		nextCardPointTpreshold = CardThresholdFunction(totalAddedCards);
+		nextCardPointTpreshold += CardThresholdFunction(totalAddedCards);
 	}
 
 	private int CardThresholdFunction(int i)
 	{
-		return (i * i) + 10;
+		return (int) Mathf.Floor(0.05f * (float)(i * i)) + 3;
 	}
 }
