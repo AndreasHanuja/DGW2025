@@ -1,4 +1,8 @@
+using DG.Tweening;
+using Game.Map.Models;
 using Game.Map.WFC;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -9,6 +13,10 @@ public class Raycast : MonoBehaviour
     [SerializeField] public UnityEvent<Vector2Int> click;
     [SerializeField] public int gridSize = 32;
 
+    [SerializeField] public TMP_Text text;
+    [SerializeField] public Transform signTransform;
+
+    private Vector2Int lastGridPositionLogic = Vector2Int.zero;
     // Update is called once per frame
     private void Update()
     {
@@ -32,10 +40,44 @@ public class Raycast : MonoBehaviour
         marker.transform.GetChild(1).gameObject.SetActive(!isValid);
         marker.transform.position = new Vector3(GetGridPosition().x, 0f , GetGridPosition().y);
 
-
+        if(isValid )
+        {
+            byte hoverBiom = WFCManager.Instance.GetGroundCache()[gridPositionLogic.x, gridPositionLogic.y];
+            //TODO UPDATE BIOM CARD
+        }
+        if (lastGridPositionLogic != gridPositionLogic && gridPosition == GetGridPosition())
+        {
+            lastGridPositionLogic = gridPositionLogic;
+            UpdateHoverGridPosition(gridPositionLogic);
+        }
         GridClick();
+
+        Vector3 dif = signTransform.transform.position - Camera.main.transform.position;
+        dif.y = 0;
+        signTransform.forward = dif;
     }
 
+    Tween jumpTween;
+    private void UpdateHoverGridPosition(Vector2Int gridPosition)
+    {
+        short hoverOutput = WFCManager.Instance.GetOutputCache()[gridPosition.x, gridPosition.y];
+        List<PlyModelPrefab> prefabs = WFCManager.Instance.GetPrefabs();
+
+        Debug.Log(hoverOutput);
+        bool isActive = hoverOutput != -1 && hoverOutput != prefabs.Count - 1;
+        signTransform.gameObject.SetActive(isActive);
+        //text.text
+        if (isActive)
+        {
+            jumpTween?.Kill();
+            signTransform.localPosition = Vector3.zero;
+            Sequence s = DOTween.Sequence();
+            s.Insert(0,signTransform.DOLocalJump(signTransform.localPosition, 0.5f, 1, 0.3f));
+            signTransform.localScale = Vector3.one * 0.6f;
+            s.Insert(0, signTransform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack));
+            jumpTween = s;
+        }
+    }
     private Vector2Int GetGridPosition()
     {
         if (GameManager.Instance.IsInState(GameManager.State.MainMenu))

@@ -37,6 +37,11 @@ namespace Game.Map.WFC
         {
             return inputCached;
         }
+        public short[,] GetOutputCache()
+        {
+            return outputCached;
+        }
+
         public void WFC_Init(int mapSize, int seed, List<PlyModelPrefab> prefabs, byte[,] groundCache)
         {
             WFCManager.mapSize = mapSize;
