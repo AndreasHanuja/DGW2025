@@ -12,11 +12,13 @@ public class UILevelOverlay : UICanvasGeneric
 {
 	[SerializeField] private TMP_Text drawPileSize;
 	[SerializeField] private TMP_Text pointsText;
+	[SerializeField] private TMP_Text cardNameText;
 	[SerializeField] private Image cardImage;
 	[SerializeField] private Image cardImageBack;
 	[SerializeField] private Image cardStackBarFillImage;
 	[SerializeField] private GameObject gameOverPannel;
 	[SerializeField] private Sprite[] images;
+	[SerializeField] private string[] buildingNames;
 	[SerializeField] private Sprite imagesBackMedival;
 	[SerializeField] private Sprite imagesBackSolar;
 	[SerializeField] private Sprite imagesBackFantasy;
@@ -85,18 +87,20 @@ public class UILevelOverlay : UICanvasGeneric
 
 	private void CurrentCardChangedHandler(byte card)
 	{
+		cardNameText.text = buildingNames[card];
 		cardImage.sprite = images[card];
-		if (card == 6)
+
+		switch (Raycast.dirtyBackgroundImageReference)
 		{
-			cardImageBack.sprite = imagesBackSolar;
-		}
-		else if (card == 7)
-		{
-			cardImageBack.sprite = imagesBackFantasy;
-		}
-		else
-		{
-			cardImageBack.sprite = imagesBackMedival;
+			case 0:
+				cardImageBack.sprite = imagesBackMedival;
+				break;
+			case 1:
+				cardImageBack.sprite = imagesBackSolar;
+				break;
+			case 2:
+				cardImageBack.sprite = imagesBackFantasy;
+				break;
 		}
 		UpdateBar();
 	}

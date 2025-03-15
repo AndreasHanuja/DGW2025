@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Stateless;
 using Stateless.Graph;
 using System;
@@ -68,7 +69,7 @@ public class GameManager : SingeltonMonoBehaviour<GameManager>
 			.PermitIf(Trigger.PlacingBuildingCompleted, State.DrawingBuilding, () => CanDrawBuilding)
 			.PermitIf(Trigger.PlacingBuildingCompleted, State.GameOver, () => !CanDrawBuilding)
 			.OnEntry(() => AudioManager.Instance.PlaySound(AudioManager.Sound.PlaceBuilding))
-			.OnEntry(() => FireTrigger(Trigger.PlacingBuildingCompleted));
+			.OnEntry(() => DOVirtual.DelayedCall(2.0f, () => FireTrigger(Trigger.PlacingBuildingCompleted)));
 
 		stateMachiene.Configure(State.GameOver)
 			.Permit(Trigger.RestartLevel, State.Starting);
