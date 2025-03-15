@@ -63,10 +63,10 @@ public class Raycast : MonoBehaviour
         short hoverOutput = WFCManager.Instance.GetOutputCache()[gridPosition.x, gridPosition.y];
         List<PlyModelPrefab> prefabs = WFCManager.Instance.GetPrefabs();
 
-        Debug.Log(hoverOutput);
         bool isActive = hoverOutput != -1 && hoverOutput != prefabs.Count - 1;
         signTransform.gameObject.SetActive(isActive);
-        //text.text
+
+        text.text = prefabs[hoverOutput].setup.displayText;
         if (isActive)
         {
             jumpTween?.Kill();
