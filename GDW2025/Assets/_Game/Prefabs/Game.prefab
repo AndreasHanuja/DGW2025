@@ -427,7 +427,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &135233117700812071
 Transform:
   m_ObjectHideFlags: 0
@@ -867,6 +867,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Code
       objectReference: {fileID: 0}
+    - target: {fileID: 7783676267184403408, guid: 57de2220ffad3c147b53c01f23a05d27, type: 3}
+      propertyPath: models.Array.size
+      value: 47
+      objectReference: {fileID: 0}
+    - target: {fileID: 7783676267184403408, guid: 57de2220ffad3c147b53c01f23a05d27, type: 3}
+      propertyPath: 'models.Array.data[45]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 8c81ddf9a58061445ae77ee56fc5546c, type: 2}
+    - target: {fileID: 7783676267184403408, guid: 57de2220ffad3c147b53c01f23a05d27, type: 3}
+      propertyPath: 'models.Array.data[46]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 5a9922ebdfdbfbc42b75adba2d105650, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

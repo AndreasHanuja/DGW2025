@@ -281,7 +281,6 @@ MonoBehaviour:
   moveSpeed: 100
   minCameraMovePoint: {x: 0, y: 0}
   maxCameraMovePoint: {x: 192, y: 192}
-  collisionLayer: {fileID: 0}
 --- !u!1 &4747935928891555733
 GameObject:
   m_ObjectHideFlags: 0
@@ -518,6 +517,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   gridSize: 32
+  text: {fileID: 0}
+  signTransform: {fileID: 0}
 --- !u!114 &5828107586123717442
 MonoBehaviour:
   m_ObjectHideFlags: 0
