@@ -46,7 +46,7 @@ namespace Game.Map
 
             List<PlyModelPrefab> prefabs = WFCManager.Instance.GetPrefabs();
 
-            outputChange = outputChange.Where(o => o.oldValue != -1 || o.newValue != prefabs.Last().id);
+            outputChange = outputChange.Where(o => o.newValue != prefabs.Last().id);
             //render new models
 
             var buildingTasks1 = outputChange.Select(async o =>
